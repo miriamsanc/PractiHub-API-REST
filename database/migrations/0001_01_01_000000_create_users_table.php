@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->enum('role', ['student', 'company'])->default('student');
             $table->rememberToken();
+            $table->string('cv_path')->nullable();
             $table->timestamps();
         });
 

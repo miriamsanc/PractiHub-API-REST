@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('applications', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete(); 
+            $table->foreignId('offer_id')->constrained()->cascadeOnDelete(); 
+            $table->enum('status', ['pending', 'read', 'accepted', 'rejected'])->default('pending');
+            $table->string('cv_path')->nullable();
             $table->timestamps();
+
+            $table->unique(['user_id', 'offer_id']);
         });
     }
 
