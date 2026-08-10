@@ -49,9 +49,12 @@ class UserController extends Controller
     // Eliminar perfil
     public function destroy(Request $request, User $user)
     {
-        if ($request->user()->id !== $user->id) {
-            return response()->json(['message' => 'Forbidden: You can only delete your own profile'], 403);
+        if ($user->role !== 'student') {
+            return response()->json(['message' => 'Not a student profile'], 404);
         }
+    
+        // USO POLICY
+        Gate::authorize('delete', $user);
 
         $user->delete();
 
