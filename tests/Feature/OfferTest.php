@@ -47,7 +47,8 @@ it('forbids a student from creating an offer', function () {
 
     $response = $this->postJson('/api/offers', [
         'title' => 'Intento de Hackeo',
-        // ...
+        'description' => 'No debería permitirse',
+        'location' => 'Madrid',
     ]);
 
     $response->assertStatus(403); // 403 Forbidden
