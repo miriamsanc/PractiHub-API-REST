@@ -7,9 +7,22 @@ use Illuminate\Http\Request;
 
 class OfferController extends Controller
 {
-    // Lista todas las ofertas
-    public function index()
+    // Lista todas las ofertas (con filtros opcionales)
+    public function index(Request $request)
     {
+        $offers = Offer::query()
+            // Filtro por category_id exacto
+            ->when($request->query('category_id'), function ($query, $categoryId) {
+                $query->where('category_id', $categoryId);
+            })
+            // Filtro por ubicación (usamos 'like' para que sea una búsqueda más flexible)
+            ->when($request->query('location'), function ($query, $location) {
+                $query->where('location', 'like', '%' . $location . '%');
+            })
+            // Opcional pero recomendado: traernos los datos de la categoría y la empresa para que el Front-End tenga más info
+            ->with(['category', 'company']) 
+            ->get();
+            
         return response()->json(Offer::all(), 200);
     }
 

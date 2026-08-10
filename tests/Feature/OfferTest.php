@@ -95,3 +95,37 @@ it('allows the owner company to delete their offer', function () {
     $response->assertStatus(200);
     $this->assertDatabaseMissing('offers', ['id' => $offer->id]);
 });
+
+// FILTROS DE OFERTAS
+it('filters offers by location', function () {
+    // Creamos ofertas en diferentes ciudades
+    Offer::factory()->create(['location' => 'Madrid']);
+    Offer::factory()->create(['location' => 'Barcelona']);
+    Offer::factory()->create(['location' => 'Madrid']);
+    
+    Passport::actingAs(User::factory()->create());
+
+    // Hacemos la petición filtrando por Madrid
+    $response = $this->getJson('/api/offers?location=Madrid');
+
+    $response->assertStatus(200)
+             ->assertJsonCount(2); // Debería devolver solo las 2 de Madrid
+});
+
+it('filters offers by category', function () {
+    $category1 = Category::factory()->create();
+    $category2 = Category::factory()->create();
+
+    // Creamos ofertas con diferentes categorías
+    Offer::factory()->create(['category_id' => $category1->id]);
+    Offer::factory()->create(['category_id' => $category1->id]);
+    Offer::factory()->create(['category_id' => $category2->id]);
+    
+    Passport::actingAs(User::factory()->create());
+
+    // Filtramos por la categoría 1
+    $response = $this->getJson("/api/offers?category_id={$category1->id}");
+
+    $response->assertStatus(200)
+             ->assertJsonCount(2); // Debería devolver solo las 2 de la categoría 1
+});
