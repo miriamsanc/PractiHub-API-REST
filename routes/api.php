@@ -8,7 +8,7 @@ use App\Http\Controllers\AuthController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Ruta de prueba para ver si el usuario está autenticado
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+// Rutas protegidas (Requieren enviar el Token)
+Route::middleware('auth:api')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
 });

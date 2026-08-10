@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Artisan;
 //Generar las claves de passport
 beforeEach(function () {
     Artisan::call('passport:keys');
+    Artisan::call('passport:client --personal --no-interaction');
 });
 
 // Tests de registro
@@ -59,8 +60,7 @@ it('fails registration if validation fails', function () {
 
     $response = $this->postJson('/api/register', $data);
 
-    $response->assertStatus(422) 
-             ->assertJsonValidationErrors(['email', 'password', 'role']);
+    $response->assertStatus(422)->assertJsonValidationErrors(['email', 'password', 'role']);
 });
 
 // Tests de inicio de sesion
@@ -78,8 +78,7 @@ it('logs in an existing user successfully', function () {
 
     $response = $this->postJson('/api/login', $data);
 
-    $response->assertStatus(200)
-             ->assertJsonStructure(['user', 'token']);
+    $response->assertStatus(200)->assertJsonStructure(['user', 'token']);
 });
 
 it('fails login with incorrect credentials', function () {
@@ -95,6 +94,31 @@ it('fails login with incorrect credentials', function () {
 
     $response = $this->postJson('/api/login', $data);
 
-    $response->assertStatus(401) 
-             ->assertJson(['message' => 'Invalid credentials']);
+    $response->assertStatus(401)->assertJson(['message' => 'Invalid credentials']);
 });
+
+// Tests de cierre de sesion
+it('logs out an authenticated user successfully', function () {
+    // Crea un usuario y le genera un token
+    $user = User::factory()->create();
+    $token = $user->createToken('auth_token')->accessToken;
+
+    // Hace la petición enviando el token en la cabecera Authorization
+    $response = $this->withHeaders([
+        'Authorization' => 'Bearer ' . $token,
+    ])->postJson('/api/logout');
+
+    $response->assertStatus(200)
+             ->assertJson(['message' => 'Logged out successfully']);
+});
+
+it('fails logout if user is not authenticated', function () {
+    // Intenta hacer logout sin enviar ningún token
+    $response = $this->postJson('/api/logout');
+
+    $response->assertStatus(401) // 401 Unauthorized
+             ->assertJson(['message' => 'Unauthenticated.']);
+});
+
+
+
