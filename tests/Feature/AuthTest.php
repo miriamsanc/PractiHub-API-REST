@@ -15,7 +15,7 @@ it('registers a user successfully as student', function () {
         'email' => 'juan@example.com',
         'password' => 'password123',
         'password_confirmation' => 'password123',
-        'role' => 'estudiante',
+        'role' => 'student',
     ];
 
     $response = $this->postJson('/api/register', $data);
@@ -28,7 +28,7 @@ it('registers a user successfully as student', function () {
 
     $this->assertDatabaseHas('users', [
         'email' => 'juan@example.com',
-        'role' => 'estudiante',
+        'role' => 'student',
     ]);
 });
 
@@ -38,7 +38,7 @@ it('registers a user successfully as company', function () {
         'email' => 'contacto@empresa.com',
         'password' => 'password123',
         'password_confirmation' => 'password123',
-        'role' => 'empresa',
+        'role' => 'company',
     ];
 
     $response = $this->postJson('/api/register', $data);
@@ -47,7 +47,7 @@ it('registers a user successfully as company', function () {
     
     $this->assertDatabaseHas('users', [
         'email' => 'contacto@empresa.com',
-        'role' => 'empresa',
+        'role' => 'company',
     ]);
 });
 
