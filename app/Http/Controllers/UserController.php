@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
@@ -21,10 +22,14 @@ class UserController extends Controller
     // Actualizar perfil
     public function update(Request $request, User $user)
     {
-        if ($request->user()->id !== $user->id) {
-            return response()->json(['message' => 'Forbidden: You can only edit your own profile'], 403);
+        // 1. Validamos que el endpoint sea el correcto (Estudiante)
+        if ($user->role !== 'student') {
+            return response()->json(['message' => 'Not a student profile'], 404);
         }
 
+        //Uso de la policy (verifica si puede hacer update, si da false devuelve un 403)
+        Gate::authorize('update', $user);
+    
         // Aqui sometimes para que solo valide el campo si se envía en la petición.
         // En email ignora el ID del usuario actual para la regla unique
         $validatedData = $request->validate([
