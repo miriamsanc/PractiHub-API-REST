@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class CompanyController extends Controller
 {
     // Ver el perfil de una empresa
     public function show(User $company)
     {
-        // Asegurarnos de que el usuario solicitado es realmente una empresa
+        // Asegurarnos de que el usuario solicitado es una empresa
         if ($company->role !== 'company') {
             return response()->json(['message' => 'Company not found'], 404);
         }
@@ -21,18 +22,22 @@ class CompanyController extends Controller
     // Actualizar el perfil
     public function update(Request $request, User $company)
     {
-        // 1. AUTORIZACIÓN: Solo el dueño de la cuenta puede editarla
-        if ($request->user()->id !== $company->id) {
-            return response()->json(['message' => 'Forbidden: You can only edit your own profile'], 403);
+        // Verificamos que el perfil a editar sea una empresa
+        if ($company->role !== 'company') {
+            return response()->json(['message' => 'Company not found'], 404);
         }
+    
+        // AUTORIZACIÓN VÍA POLICY: Solo el dueño de la cuenta puede editarla
+        // Si no es el dueño, detiene la ejecución y devuelve un 403.
+        Gate::authorize('update', $company);
 
-        // 2. VALIDACIÓN
+        // VALIDACIÓN
         $validatedData = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $company->id,
         ]);
 
-        // 3. ACTUALIZACIÓN
+        // ACTUALIZACIÓN
         $company->update($validatedData);
 
         return response()->json([
@@ -44,12 +49,14 @@ class CompanyController extends Controller
     // Eliminar la empresa
     public function destroy(Request $request, User $company)
     {
-        // 1. AUTORIZACIÓN
-        if ($request->user()->id !== $company->id) {
-            return response()->json(['message' => 'Forbidden: You can only delete your own profile'], 403);
+        if ($company->role !== 'company') {
+            return response()->json(['message' => 'Company not found'], 404);
         }
+    
+        // AUTORIZACIÓN CON POLICY
+        Gate::authorize('delete', $company);
 
-        // 2. ELIMINACIÓN
+        // ELIMINACIÓN
         $company->delete();
 
         return response()->json(['message' => 'Company deleted successfully'], 200);
