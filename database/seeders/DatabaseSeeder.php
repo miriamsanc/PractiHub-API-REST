@@ -24,14 +24,14 @@ class DatabaseSeeder extends Seeder
             'name' => 'Tech Solutions SL',
             'email' => 'empresa@test.com',
             'password' => bcrypt('password123'), 
-            'role' => 'empresa',
+            'role' => 'company',
         ]);
         
         $estudiante = User::factory()->create([
             'name' => 'Juan Estudiante',
             'email' => 'estudiante@test.com',
             'password' => bcrypt('password123'),
-            'role' => 'estudiante',
+            'role' => 'student',
         ]);
         
         Offer::factory(10)->create();

@@ -20,7 +20,7 @@ class ApplicationFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory()->create(['role' => 'estudiante']),
+            'user_id' => User::factory()->create(['role' => 'student']),
             'offer_id' => Offer::factory(),
             'status' => fake()->randomElement(['pending', 'read', 'accepted', 'rejected']),
             'cv_path' => 'cvs/fake_cv_test.pdf',
