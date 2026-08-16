@@ -23,7 +23,7 @@ class OfferController extends Controller
             ->with(['category', 'company']) 
             ->get();
             
-        return response()->json(Offer::all(), 200);
+        return response()->json($offers, 200);
     }
 
     // Crea una oferta (Solo empresas)
