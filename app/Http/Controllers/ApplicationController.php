@@ -6,15 +6,16 @@ use App\Models\Offer;
 use App\Models\Application;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\StoreApplicationRequest;
+use App\Http\Resources\ApplicationResource;
+use Illuminate\Support\Facades\Gate;
 
 class ApplicationController extends Controller
 {
-    public function store(Request $request, Offer $offer): JsonResponse
+    public function store(StoreApplicationRequest $request, Offer $offer)
     {
-        // Autorización: Solo los estudiantes pueden inscribirse
-        if ($request->user()->role !== 'student') {
-            return response()->json(['message' => 'Forbidden: Only students can apply to offers'], 403);
-        }
+        // Autorización: Llama a ApplicationPolicy@create (lanza 403 si no es estudiante)
+        Gate::authorize('create', Application::class);
 
         // No se puede aplicar a una oferta cerrada
         if (!$offer->is_active) {
@@ -30,26 +31,14 @@ class ApplicationController extends Controller
             return response()->json(['message' => 'You have already applied to this offer'], 409); // 409 Conflict
         }
 
-        // Validación: Pide una url para el cv
-        $request->validate([
-            'cv_path' => 'required|url|max:255',
-        ]);
-
-        // Coge el texto que ha enviado el estudiante
-        $path = $request->input('cv_path');
-
-        // Crear la inscripción
+        // Crear la inscripción (Usamos los datos validados del FormRequest (el cv_path))
         $application = Application::create([
             'user_id' => $request->user()->id,
             'offer_id' => $offer->id,
             'status' => 'pending', 
-            'cv_path' => $path,
+            'cv_path' => $request->validated('cv_path'),
         ]);
 
-        
-        return response()->json([
-            'message' => 'Application submitted successfully',
-            'application' => $application
-        ], 201);
+        return new ApplicationResource($application);
     }
 }
