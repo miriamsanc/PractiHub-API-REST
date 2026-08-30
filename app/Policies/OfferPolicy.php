@@ -21,7 +21,13 @@ class OfferPolicy
      */
     public function view(User $user, Offer $offer): bool
     {
-        return true;
+        // las empresas pueden ver cualquier oferta
+        if ($user->role === 'company') {
+            return true;
+        }
+
+        // Si es estudiante, solo puede verla si está activa
+        return $offer->is_active === true;
     }
 
     /**

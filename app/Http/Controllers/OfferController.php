@@ -33,8 +33,20 @@ class OfferController extends Controller
             ->with(['category', 'company']) 
             ->get();
             
-        // Transforma el array de base de datos usando tu plantilla
+        
         return OfferResource::collection($offers);
+    }
+
+    public function show(Offer $offer): OfferResource
+    {
+        // Autorización (La Policy permite que cualquier usuario autenticado la vea)
+        Gate::authorize('view', $offer);
+
+        // Cargamos las relaciones para que el Frontend tenga el nombre de la categoría y la empresa
+        $offer->load(['category', 'company']);
+
+        // Devuelve el dato limpio usando el Resource 
+        return new OfferResource($offer);
     }
 
     // Crea una oferta (Solo empresas)
