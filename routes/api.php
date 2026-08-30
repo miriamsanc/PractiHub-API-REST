@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OfferController;
+use App\Http\Controllers\ApplicationController;
 
 // Rutas públicas
 Route::post('/register', [AuthController::class, 'register']);
@@ -17,22 +18,23 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Rutas de Estudiantes (Users)
-    Route::get('/users/{user}', [UserController::class, 'show']);
-    Route::put('/users/{user}', [UserController::class, 'update']);
-    Route::delete('/users/{user}', [UserController::class, 'destroy']);
+    Route::apiResource('users', UserController::class)->only(['show', 'update', 'destroy']);
 
     // Rutas de Empresas (Companies)
-    Route::get('/companies/{company}', [CompanyController::class, 'show']);
-    Route::put('/companies/{company}', [CompanyController::class, 'update']);
-    Route::delete('/companies/{company}', [CompanyController::class, 'destroy']);
+    Route::apiResource('companies', CompanyController::class)->only(['show', 'update', 'destroy']);
 
     // Categorias
-    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::apiResource('categories', CategoryController::class)->only(['index']);
 
     // Ofertas
-    Route::get('/offers', [OfferController::class, 'index']);
-    Route::post('/offers', [OfferController::class, 'store']);
-    Route::put('/offers/{offer}', [OfferController::class, 'update']);
-    Route::delete('/offers/{offer}', [OfferController::class, 'destroy']);
+    Route::apiResource('offers', OfferController::class);
+
+    // Applications
+    Route::post('/offers/{offer}/applications', [ApplicationController::class, 'store']);
+    Route::get('/applications', [ApplicationController::class, 'index']);
+    Route::delete('/applications/{application}', [ApplicationController::class, 'destroy']);
+
+
+
 
 });

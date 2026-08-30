@@ -21,6 +21,10 @@ class ApplicationResource extends JsonResource
             'status' => $this->status,
             'cv_link' => $this->cv_path, 
             'applied_at' => $this->created_at->format('Y-m-d H:i:s'),
+
+            // Aqui solo adjunta estos datos si los hemos pedido con el with() en el controlador
+            'student' => $this->whenLoaded('user'),
+            'offer' => new OfferResource($this->whenLoaded('offer')),
         ];
     }
 }

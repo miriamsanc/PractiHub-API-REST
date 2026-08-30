@@ -47,14 +47,14 @@ class ApplicationController extends Controller
         $user = $request->user();
 
         if ($user->role === 'student') {
-            // ESTUDIANTE: Busca sus propias inscripciones.
-            // Cargamos la relación 'offer' para que sepa a qué se apuntó.
+            // ESTUDIANTE: Busca sus propias inscripciones
+            // Cargamos la relación 'offer' para que sepa a qué se apuntó
             $applications = Application::with('offer')
                 ->where('user_id', $user->id)
                 ->get();
         } else {
-            // EMPRESA: Busca inscripciones hechas a sus ofertas.
-            // Cargamos 'user' (el estudiante) y 'offer' (para saber a cuál de sus ofertas es).
+            // EMPRESA: Busca inscripciones hechas a sus ofertas
+            // Cargamos 'user' (el estudiante) y 'offer' (para saber a cuál de sus ofertas es)
             $applications = Application::with(['user', 'offer'])
                 ->whereHas('offer', function ($query) use ($user) {
                     $query->where('user_id', $user->id);
