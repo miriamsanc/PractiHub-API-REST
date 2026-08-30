@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Offer;
+use App\Http\Requests\StoreOfferRequest;
+use App\Http\Requests\UpdateOfferRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class OfferController extends Controller
 {
@@ -15,11 +18,15 @@ class OfferController extends Controller
             ->when($request->query('category_id'), function ($query, $categoryId) {
                 $query->where('category_id', $categoryId);
             })
-            // Filtro por ubicación (usamos 'like' para que sea una búsqueda más flexible)
+            // Filtro por ubicación ( like para que sea mas flexible)
             ->when($request->query('location'), function ($query, $location) {
                 $query->where('location', 'like', '%' . $location . '%');
             })
-            // Opcional pero recomendado: traernos los datos de la categoría y la empresa para que el Front-End tenga más info
+            // Si no es empresa solo ve las ofertas activas
+            ->when($request->user()->role !== 'company', function ($query) {
+                $query->where('is_active', true);
+            })
+            // traermos los datos de categoria y empresa para que el front tenga mas info
             ->with(['category', 'company']) 
             ->get();
             
@@ -27,12 +34,18 @@ class OfferController extends Controller
     }
 
     // Crea una oferta (Solo empresas)
-    public function store(Request $request)
+    public function store(StoreOfferRequest $request)
     {
-        // AUTORIZACIÓN: Solo usuarios con rol 'company' pueden crear
-        if ($request->user()->role !== 'company') {
-            return response()->json(['message' => 'Forbidden: Only companies can create offers'], 403);
-        }
+        // AUTORIZACIÓN: Solo usuarios con rol 'company' pueden crear, validamos permiso con policy
+        Gate::authorize('create', Offer::class);
+
+        $offer = $request->user()->offers()->create($request->validated());
+
+        return response()->json($offer, 201);
+
+        //if ($request->user()->role !== 'company') {
+            //return response()->json(['message' => 'Forbidden: Only companies can create offers'], 403);
+        //}
 
         // VALIDACIÓN
         $validatedData = $request->validate([
