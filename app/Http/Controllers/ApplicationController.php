@@ -82,4 +82,30 @@ class ApplicationController extends Controller
             'application' => new ApplicationResource($application)
         ], 200);
     }
+
+    public function destroy(Request $request, Application $application): JsonResponse
+    {
+        // Autorización: Debe ser el estudiante dueño de la candidatura
+        Gate::authorize('delete', $application);
+
+        // Límite de 30 minutos para retirar la candidatura el estudiante
+        if ($application->created_at->addMinutes(30)->isPast()) {
+            return response()->json([
+                'message' => 'Time limit exceeded. You can only withdraw your application within the first 30 minutes.'
+            ], 400);
+        }
+
+        // No se puede retirar si la empresa ya la gestionó
+        if ($application->status !== 'pending' && $application->status !== 'read') {
+            return response()->json([
+                'message' => 'You cannot withdraw an application that has already been processed.'
+            ], 400);
+        }
+
+        $application->delete();
+
+        return response()->json([
+            'message' => 'Application withdrawn successfully'
+        ], 200);
+    }
 }
