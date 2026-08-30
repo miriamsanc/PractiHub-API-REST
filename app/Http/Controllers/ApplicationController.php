@@ -43,6 +43,13 @@ class ApplicationController extends Controller
         return new ApplicationResource($application);
     }
 
+    public function show(Application $application): ApplicationResource
+    {
+        Gate::authorize('view', $application);
+        
+        return new ApplicationResource($application->load(['user', 'offer']));
+    }
+
     public function index(Request $request)
     {
         $user = $request->user();

@@ -32,6 +32,7 @@ Route::middleware('auth:api')->group(function () {
     // Applications
     Route::post('/offers/{offer}/applications', [ApplicationController::class, 'store']);
     Route::get('/applications', [ApplicationController::class, 'index']);
+    Route::get('/applications/{application}', [ApplicationController::class, 'show']);
     Route::delete('/applications/{application}', [ApplicationController::class, 'destroy']);
     Route::put('/applications/{application}', [ApplicationController::class, 'update']);
 

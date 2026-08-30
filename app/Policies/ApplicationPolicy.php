@@ -21,6 +21,14 @@ class ApplicationPolicy
      */
     public function view(User $user, Application $application): bool
     {
+        if ($user->role === 'student') {
+        return $user->id === $application->user_id;
+        }
+
+        if ($user->role === 'company') {
+        return $user->id === $application->offer->user_id;
+        }   
+        
         return false;
     }
 
