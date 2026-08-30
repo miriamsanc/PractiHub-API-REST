@@ -7,6 +7,7 @@ use App\Models\Application;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\StoreApplicationRequest;
+use App\Http\Requests\UpdateApplicationRequest;
 use App\Http\Resources\ApplicationResource;
 use Illuminate\Support\Facades\Gate;
 
@@ -63,5 +64,22 @@ class ApplicationController extends Controller
         }
 
         return ApplicationResource::collection($applications);
+    }
+    
+    public function update(UpdateApplicationRequest $request, Application $application): JsonResponse
+    {
+        // Autorización: Llama a update de ApplicationPolicy
+        // Si no es la empresa propietaria de la oferta lanzará un 403 Forbidden
+        Gate::authorize('update', $application);
+
+        // Actualiza el estado con el dato validado
+        $application->update([
+            'status' => $request->validated('status'),
+        ]);
+
+        return response()->json([
+            'message' => 'Application status updated successfully',
+            'application' => new ApplicationResource($application)
+        ], 200);
     }
 }
