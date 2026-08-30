@@ -58,13 +58,11 @@ class OfferController extends Controller
         return response()->json(['offer' => $offer], 200);
     }
 
-    // Elimina una oferta (Solo la empresa dueña)
+    // Elimina una oferta (Solo la empresa creadora)
     public function destroy(Request $request, Offer $offer)
     {
-        // AUTORIZACIÓN: Comprueba que es el dueño
-        if ($request->user()->id !== $offer->user_id) {
-            return response()->json(['message' => 'Forbidden: You do not own this offer'], 403);
-        }
+        // AUTORIZACIÓN: Comprueba que es el propietario
+        Gate::authorize('delete', $offer);
 
         $offer->delete();
 
