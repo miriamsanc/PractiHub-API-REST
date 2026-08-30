@@ -22,7 +22,6 @@ class DatabaseSeeder extends Seeder
         CategorySeeder::class,
         ]);
     
-        Category::factory(5)->create();
         
         $empresa = User::factory()->create([
             'name' => 'Tech Solutions SL',
@@ -30,21 +29,32 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password123'), 
             'role' => 'company',
         ]);
-        
+        $empresas = User::factory(4)->create(['role' => 'company']);
+
         $estudiante = User::factory()->create([
             'name' => 'Juan Estudiante',
             'email' => 'estudiante@test.com',
             'password' => bcrypt('password123'),
             'role' => 'student',
         ]);
-        
-        Offer::factory(10)->create();
-        
-        Application::factory(15)->create();
+        $estudiantes = User::factory(9)->create(['role' => 'student']);
 
-        //User::factory()->create([
-            //'name' => 'Test User',
-            //'email' => 'test@example.com',
-        //]);
+        $categories = Category::all();
+
+        $offers = Offer::factory(10)->make()->each(function ($offer) use ($empresa, $empresas, $categories) {
+        $offer->user_id = collect([$empresa])->merge($empresas)->random()->id;
+        $offer->category_id = $categories->random()->id;
+        $offer->save();
+        });
+    
+        Application::factory(15)->make()->each(function ($application) use ($estudiante, $estudiantes, $offers) {
+        $application->user_id = collect([$estudiante])->merge($estudiantes)->random()->id;
+        $application->offer_id = $offers->random()->id;
+        $application->save();
+        });
+        
+        
+
+        
     }
 }
