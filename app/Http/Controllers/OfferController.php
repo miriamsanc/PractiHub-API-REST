@@ -36,30 +36,14 @@ class OfferController extends Controller
     // Crea una oferta (Solo empresas)
     public function store(StoreOfferRequest $request)
     {
-        // AUTORIZACIÓN: Solo usuarios con rol 'company' pueden crear, validamos permiso con policy
+        // AUTORIZACIÓN: Solo usuarios con rol 'company' pueden crear, validamos permiso con policy, si devuelve false (403)
         Gate::authorize('create', Offer::class);
 
+        // CREACIÓN: Le asignamos la oferta al usuario autenticado
         $offer = $request->user()->offers()->create($request->validated());
 
-        return response()->json($offer, 201);
-
-        //if ($request->user()->role !== 'company') {
-            //return response()->json(['message' => 'Forbidden: Only companies can create offers'], 403);
-        //}
-
-        // VALIDACIÓN
-        $validatedData = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'location' => 'required|string|max:255',
-        ]);
-
-        // CREACIÓN: Le asignamos la oferta al usuario autenticado
-        $validatedData['user_id'] = $request->user()->id;
-        $offer = Offer::create($validatedData);
-
         return response()->json(['offer' => $offer], 201);
+        
     }
 
     // Edita una oferta (Solo empresa dueña)
