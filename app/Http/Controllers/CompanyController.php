@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 
 class CompanyController extends Controller
 {
     // Ver el perfil de una empresa
-    public function show(User $company)
+    public function show(User $company): JsonResponse
     {
         // Asegurarnos de que el usuario solicitado es una empresa
         if ($company->role !== 'company') {
@@ -20,7 +21,7 @@ class CompanyController extends Controller
     }
 
     // Actualizar el perfil
-    public function update(Request $request, User $company)
+    public function update(Request $request, User $company): JsonResponse
     {
         // Verificamos que el perfil a editar sea una empresa
         if ($company->role !== 'company') {
@@ -47,7 +48,7 @@ class CompanyController extends Controller
     }
 
     // Eliminar la empresa
-    public function destroy(Request $request, User $company)
+    public function destroy(Request $request, User $company): JsonResponse
     {
         if ($company->role !== 'company') {
             return response()->json(['message' => 'Company not found'], 404);

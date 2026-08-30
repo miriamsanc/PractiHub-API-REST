@@ -6,12 +6,13 @@ use App\Models\Offer;
 use App\Http\Requests\StoreOfferRequest;
 use App\Http\Requests\UpdateOfferRequest;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 
 class OfferController extends Controller
 {
     // Lista todas las ofertas (con filtros opcionales)
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $offers = Offer::query()
             // Filtro por category_id exacto
@@ -34,7 +35,7 @@ class OfferController extends Controller
     }
 
     // Crea una oferta (Solo empresas)
-    public function store(StoreOfferRequest $request)
+    public function store(StoreOfferRequest $request): JsonResponse
     {
         // AUTORIZACIÓN: Solo usuarios con rol 'company' pueden crear, validamos permiso con policy, si devuelve false (403)
         Gate::authorize('create', Offer::class);
@@ -47,7 +48,7 @@ class OfferController extends Controller
     }
 
     // Edita una oferta (Solo empresa dueña)
-    public function update(UpdateOfferRequest $request, Offer $offer)
+    public function update(UpdateOfferRequest $request, Offer $offer): JsonResponse
     {
         // AUTORIZACIÓN: Comprobar que el usuario autenticado es el dueño de la oferta(false en policy da 403)
         Gate::authorize('update', $offer);
@@ -59,7 +60,7 @@ class OfferController extends Controller
     }
 
     // Elimina una oferta (Solo la empresa creadora)
-    public function destroy(Request $request, Offer $offer)
+    public function destroy(Request $request, Offer $offer): JsonResponse
     {
         // AUTORIZACIÓN: Comprueba que es el propietario
         Gate::authorize('delete', $offer);
