@@ -18,6 +18,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call([
+        CategorySeeder::class,
+        ]);
+    
         Category::factory(5)->create();
         
         $empresa = User::factory()->create([
@@ -38,9 +42,9 @@ class DatabaseSeeder extends Seeder
         
         Application::factory(15)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        //User::factory()->create([
+            //'name' => 'Test User',
+            //'email' => 'test@example.com',
+        //]);
     }
 }
