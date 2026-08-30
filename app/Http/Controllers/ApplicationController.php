@@ -14,7 +14,7 @@ class ApplicationController extends Controller
 {
     public function store(StoreApplicationRequest $request, Offer $offer)
     {
-        // Autorización: Llama a ApplicationPolicy@create (lanza 403 si no es estudiante)
+        // Autorización: Llama a Create de ApplicationPolicy (lanza 403 si no es estudiante)
         Gate::authorize('create', Application::class);
 
         // No se puede aplicar a una oferta cerrada
@@ -40,5 +40,28 @@ class ApplicationController extends Controller
         ]);
 
         return new ApplicationResource($application);
+    }
+
+    public function index(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->role === 'student') {
+            // ESTUDIANTE: Busca sus propias inscripciones.
+            // Cargamos la relación 'offer' para que sepa a qué se apuntó.
+            $applications = Application::with('offer')
+                ->where('user_id', $user->id)
+                ->get();
+        } else {
+            // EMPRESA: Busca inscripciones hechas a sus ofertas.
+            // Cargamos 'user' (el estudiante) y 'offer' (para saber a cuál de sus ofertas es).
+            $applications = Application::with(['user', 'offer'])
+                ->whereHas('offer', function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                })
+                ->get();
+        }
+
+        return ApplicationResource::collection($applications);
     }
 }
