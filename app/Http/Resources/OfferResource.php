@@ -26,7 +26,7 @@ class OfferResource extends JsonResource
                 return $this->category->name; 
             }),
             
-            // Puedes formatear fechas para que el frontend no sufra
+            // Formatea fechas para que el frontend no sufra
             'published_at' => $this->created_at->format('d-m-Y'), 
         ];
     }

@@ -7,12 +7,14 @@ use App\Http\Requests\StoreOfferRequest;
 use App\Http\Requests\UpdateOfferRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Resources\OfferResource;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class OfferController extends Controller
 {
     // Lista todas las ofertas (con filtros opcionales)
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
         $offers = Offer::query()
             // Filtro por category_id exacto
@@ -31,11 +33,12 @@ class OfferController extends Controller
             ->with(['category', 'company']) 
             ->get();
             
-        return response()->json($offers, 200);
+        // Transforma el array de base de datos usando tu plantilla
+        return OfferResource::collection($offers);
     }
 
     // Crea una oferta (Solo empresas)
-    public function store(StoreOfferRequest $request): JsonResponse
+    public function store(StoreOfferRequest $request): OfferResource
     {
         // AUTORIZACIÓN: Solo usuarios con rol 'company' pueden crear, validamos permiso con policy, si devuelve false (403)
         Gate::authorize('create', Offer::class);
@@ -43,12 +46,12 @@ class OfferController extends Controller
         // CREACIÓN: Le asignamos la oferta al usuario autenticado
         $offer = $request->user()->offers()->create($request->validated());
 
-        return response()->json(['offer' => $offer], 201);
+        return new OfferResource($offer);
         
     }
 
     // Edita una oferta (Solo empresa dueña)
-    public function update(UpdateOfferRequest $request, Offer $offer): JsonResponse
+    public function update(UpdateOfferRequest $request, Offer $offer): OfferResource
     {
         // AUTORIZACIÓN: Comprobar que el usuario autenticado es el dueño de la oferta(false en policy da 403)
         Gate::authorize('update', $offer);
@@ -56,7 +59,7 @@ class OfferController extends Controller
         // ACTUALIZACIÓN
         $offer->update($request->validated());
 
-        return response()->json(['offer' => $offer], 200);
+        return new OfferResource($offer);
     }
 
     // Elimina una oferta (Solo la empresa creadora)
