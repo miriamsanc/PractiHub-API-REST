@@ -47,24 +47,13 @@ class OfferController extends Controller
     }
 
     // Edita una oferta (Solo empresa dueña)
-    public function update(Request $request, Offer $offer)
+    public function update(UpdateOfferRequest $request, Offer $offer)
     {
-        // AUTORIZACIÓN: Comprobar que el usuario autenticado es el dueño de la oferta
-        if ($request->user()->id !== $offer->user_id) {
-            return response()->json(['message' => 'Forbidden: You do not own this offer'], 403);
-        }
-
-        // VALIDACIÓN
-        $validatedData = $request->validate([
-            'category_id' => 'sometimes|required|exists:categories,id',
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
-            'location' => 'sometimes|required|string|max:255',
-            'is_active' => 'sometimes|boolean',
-        ]);
-
+        // AUTORIZACIÓN: Comprobar que el usuario autenticado es el dueño de la oferta(false en policy da 403)
+        Gate::authorize('update', $offer);
+       
         // ACTUALIZACIÓN
-        $offer->update($validatedData);
+        $offer->update($request->validated());
 
         return response()->json(['offer' => $offer], 200);
     }
