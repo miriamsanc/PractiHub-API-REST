@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
     // Ver perfil 
-    public function show(User $user)
+    public function show(User $user): JsonResponse
     {
         // Verificacion que el perfil es de estudiante y no de empresa
         if ($user->role !== 'student') {
@@ -20,7 +21,7 @@ class UserController extends Controller
     }
 
     // Actualizar perfil
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user): JsonResponse
     {
         // 1. Validamos que el endpoint sea el correcto (Estudiante)
         if ($user->role !== 'student') {
@@ -47,7 +48,7 @@ class UserController extends Controller
     }
 
     // Eliminar perfil
-    public function destroy(Request $request, User $user)
+    public function destroy(Request $request, User $user): JsonResponse
     {
         if ($user->role !== 'student') {
             return response()->json(['message' => 'Not a student profile'], 404);

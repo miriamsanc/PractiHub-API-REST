@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OfferController;
 
 // Rutas públicas
 Route::post('/register', [AuthController::class, 'register']);
@@ -23,5 +25,14 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/companies/{company}', [CompanyController::class, 'show']);
     Route::put('/companies/{company}', [CompanyController::class, 'update']);
     Route::delete('/companies/{company}', [CompanyController::class, 'destroy']);
+
+    // Categorias
+    Route::get('/categories', [CategoryController::class, 'index']);
+
+    // Ofertas
+    Route::get('/offers', [OfferController::class, 'index']);
+    Route::post('/offers', [OfferController::class, 'store']);
+    Route::put('/offers/{offer}', [OfferController::class, 'update']);
+    Route::delete('/offers/{offer}', [OfferController::class, 'destroy']);
 
 });

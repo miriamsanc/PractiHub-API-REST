@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(Request $request): JsonResponse
     {
         // Validacion de los datos entrantes
         $validatedData = $request->validate([
@@ -37,7 +38,7 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|email',
@@ -63,7 +64,7 @@ class AuthController extends Controller
     }
 
 
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
         // Obtiene el token actual con el que el usuario hizo la petición y lo revoca
         $request->user()->token()->revoke();

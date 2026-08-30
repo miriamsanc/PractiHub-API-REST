@@ -22,6 +22,7 @@ class OfferFactory extends Factory
         return [
             'user_id' => User::factory()->create(['role' => 'company']), 
             'category_id' => Category::factory(), 
+            //'category_id' => Category::inRandomOrder()->first()->id,
             'title' => fake()->jobTitle(),
             'description' => fake()->paragraph(),
             'location' => fake()->city(),
