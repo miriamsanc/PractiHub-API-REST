@@ -46,7 +46,7 @@ class ApplicationController extends Controller
     public function show(Application $application): ApplicationResource
     {
         Gate::authorize('view', $application);
-        
+
         return new ApplicationResource($application->load(['user', 'offer']));
     }
 
@@ -115,4 +115,19 @@ class ApplicationController extends Controller
             'message' => 'Application withdrawn successfully'
         ], 200);
     }
+
+    //Permite que la empresa vea los estudiantes apuntados a su oferta
+
+    public function byOffer(Request $request, Offer $offer)
+    {
+        // Verificar que la empresa es la propietaria de la oferta
+        if ($request->user()->role !== 'company' || $request->user()->id !== $offer->user_id) {
+        return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $applications = $offer->applications()->with('user')->get();
+
+        return ApplicationResource::collection($applications);
+    }
+
 }
