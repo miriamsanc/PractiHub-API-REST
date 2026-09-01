@@ -53,7 +53,7 @@ class ApplicationPolicy
      */
     public function delete(User $user, Application $application): bool
     {
-        return false;
+        return $user->role === 'student' && $user->id === $application->user_id;
     }
 
     /**
