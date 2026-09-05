@@ -111,7 +111,7 @@ class ApplicationController extends Controller
         }
 
         // Límite de 30 minutos para retirar la candidatura
-        if ($application->created_at->addMinutes(30)->isPast()) {
+        if ($application->created_at->copy()->addMinutes(30)->isPast()) {
             return response()->json([
                 'message' => 'Time limit exceeded. You can only withdraw your application within the first 30 minutes.'
             ], 400);
@@ -126,12 +126,10 @@ class ApplicationController extends Controller
 
     //Permite que la empresa vea los estudiantes apuntados a su oferta
 
-    public function byOffer(Request $request, Offer $offer)
+    public function byOffer(Offer $offer)
     {
         // Verificar que la empresa es la propietaria de la oferta
-        if ($request->user()->role !== 'company' || $request->user()->id !== $offer->user_id) {
-        return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        Gate::authorize('viewAnyForOffer', $offer);
 
         $applications = $offer->applications()->with('user')->get();
 
