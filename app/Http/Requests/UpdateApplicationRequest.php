@@ -23,8 +23,8 @@ class UpdateApplicationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Solo permitimos estos estados, 'pending' no está porque es automático al crearla
-            'status' => 'required|string|in:read,accepted,rejected',
+            // Solo permitimos estos estados, 'pending' no está porque es automático al crearla y read al abrir cv
+            'status' => 'required|string|in:accepted,rejected',
         ];
     }
 }
