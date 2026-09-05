@@ -55,6 +55,22 @@ it('fails to apply when cv_path is missing', function () {
         ->assertJsonValidationErrors(['cv_path']);
 });
 
+it('fails when cv_path exceeds 255 characters', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $offer = Offer::factory()->create(['is_active' => true]);
+
+    Passport::actingAs($student);
+
+    $cvPath = 'https://example.com/' . str_repeat('a', 250);
+
+    $response = $this->postJson("/api/offers/{$offer->id}/applications", [
+        'cv_path' => $cvPath,
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['cv_path']);
+});
+
 
 it('forbids a student from applying twice to the same offer', function () {
     $student = User::factory()->create(['role' => 'student']);
@@ -105,7 +121,29 @@ it('forbids a company from applying to an offer', function () {
     $response->assertStatus(403);
 });
 
+it('returns 404 when applying to a non-existent offer', function () {
+    $student = User::factory()->create(['role' => 'student']);
+
+    Passport::actingAs($student);
+
+    $response = $this->postJson('/api/offers/999999/applications', [
+        'cv_path' => 'https://example.com/cv.pdf',
+    ]);
+
+    $response->assertStatus(404);
+});
+
 //READ//
+
+it('returns 404 when viewing a non-existent application', function () {
+    $student = User::factory()->create(['role' => 'student']);
+
+    Passport::actingAs($student);
+
+    $response = $this->getJson('/api/applications/999999');
+
+    $response->assertStatus(404);
+});
 
 it('returns only student own applications', function () {
     $student1 = User::factory()->create(['role' => 'student']);
@@ -227,6 +265,56 @@ it('forbids a student from updating application status', function () {
 
     $response->assertStatus(403);
 });
+
+it('forbids updating application status to pending', function () {
+    $company = User::factory()->create(['role' => 'company']);
+
+    $application = Application::factory()->create([
+        'status' => 'pending',
+        'offer_id' => Offer::factory()->create([
+            'user_id' => $company->id,
+        ])->id,
+    ]);
+
+    Passport::actingAs($company);
+
+    $response = $this->putJson("/api/applications/{$application->id}", [
+        'status' => 'pending',
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['status']);
+});
+
+it('allows the offer owner company to set a valid application status', function (string $status) {
+    $company = User::factory()->create(['role' => 'company']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => 'pending',
+    ]);
+
+    Passport::actingAs($company);
+
+    $response = $this->putJson("/api/applications/{$application->id}", [
+        'status' => $status,
+    ]);
+
+    $response->assertOk();
+
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => $status,
+    ]);
+})->with([
+    'read',
+    'accepted',
+    'rejected',
+]);
 
 //DELETE//
 
