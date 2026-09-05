@@ -52,6 +52,8 @@ class ApplicationController extends Controller
 
     public function index(Request $request)
     {
+        Gate::authorize('viewAny', Application::class);
+    
         $user = $request->user();
 
         if ($user->role === 'student') {
