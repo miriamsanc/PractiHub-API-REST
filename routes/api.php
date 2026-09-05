@@ -33,11 +33,11 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/offers/{offer}/applications', [ApplicationController::class, 'store']);
     Route::get('/applications', [ApplicationController::class, 'index']);
     Route::get('/applications/{application}', [ApplicationController::class, 'show']);
+    Route::get('/applications/{application}/cv', [ApplicationController::class, 'cv']);
     Route::delete('/applications/{application}', [ApplicationController::class, 'destroy']);
     Route::put('/applications/{application}', [ApplicationController::class, 'update']);
     Route::get('/offers/{offer}/applications', [ApplicationController::class, 'byOffer']);
 
-
-
+  
 
 });
