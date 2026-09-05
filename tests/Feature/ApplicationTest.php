@@ -148,3 +148,49 @@ it('forbids another user from viewing application detail', function () {
 
     $this->getJson("/api/applications/{$app->id}")->assertStatus(403);
 });
+
+it('allows offer owner company to update application status', function () {
+    $company = User::factory()->create(['role' => 'company']);
+    $offer = Offer::factory()->create(['user_id' => $company->id]);
+    $app = Application::factory()->create(['offer_id' => $offer->id, 'status' => 'pending']);
+
+    Passport::actingAs($company);
+
+    $response = $this->putJson("/api/applications/{$app->id}", [
+        'status' => 'accepted',
+    ]);
+
+    $response->assertOk()
+        ->assertJsonPath('application.status', 'accepted');
+
+    $this->assertDatabaseHas('applications', [
+        'id' => $app->id,
+        'status' => 'accepted',
+    ]);
+});
+
+it('forbids updating status with an invalid value', function () {
+    $company = User::factory()->create(['role' => 'company']);
+    $offer = Offer::factory()->create(['user_id' => $company->id]);
+    $app = Application::factory()->create(['offer_id' => $offer->id]);
+
+    Passport::actingAs($company);
+
+    $response = $this->putJson("/api/applications/{$app->id}", [
+        'status' => 'invalid_status',
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['status']);
+});
+
+it('forbids non-owner company or student from updating application status', function () {
+    $otherCompany = User::factory()->create(['role' => 'company']);
+    $app = Application::factory()->create(['status' => 'pending']);
+
+    Passport::actingAs($otherCompany);
+
+    $this->putJson("/api/applications/{$app->id}", ['status' => 'accepted'])
+        ->assertStatus(403);
+});
+
