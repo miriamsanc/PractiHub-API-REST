@@ -95,17 +95,17 @@ class ApplicationController extends Controller
         // Autorización: Debe ser el estudiante dueño de la candidatura
         Gate::authorize('delete', $application);
 
-        // Límite de 30 minutos para retirar la candidatura el estudiante
-        if ($application->created_at->addMinutes(30)->isPast()) {
-            return response()->json([
-                'message' => 'Time limit exceeded. You can only withdraw your application within the first 30 minutes.'
-            ], 400);
-        }
-
-        // No se puede retirar si la empresa ya la gestionó
+        // No se puede retirar si la empresa ya la ha gestionado
         if ($application->status !== 'pending') {
             return response()->json([
                 'message' => 'You cannot withdraw an application that has already been processed.'
+            ], 400);
+        }
+
+        // Límite de 30 minutos para retirar la candidatura
+        if ($application->created_at->addMinutes(30)->isPast()) {
+            return response()->json([
+                'message' => 'Time limit exceeded. You can only withdraw your application within the first 30 minutes.'
             ], 400);
         }
 
