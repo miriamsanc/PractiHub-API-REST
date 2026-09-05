@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Application;
 use App\Models\User;
+use App\Models\Offer;
 use Illuminate\Auth\Access\Response;
 
 class ApplicationPolicy
@@ -30,6 +31,12 @@ class ApplicationPolicy
         }   
         
         return false;
+    }
+
+    public function viewAnyForOffer(User $user, Offer $offer): bool
+    {
+        return $user->role === 'company'
+            && $user->id === $offer->user_id;
     }
 
     public function viewCv(User $user, Application $application): bool
