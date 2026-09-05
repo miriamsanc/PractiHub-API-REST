@@ -194,3 +194,50 @@ it('forbids non-owner company or student from updating application status', func
         ->assertStatus(403);
 });
 
+it('allows student to withdraw application within 30 minutes', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $app = Application::factory()->create([
+        'user_id' => $student->id,
+        'status' => 'pending',
+        'created_at' => now(),
+    ]);
+
+    Passport::actingAs($student);
+
+    $response = $this->deleteJson("/api/applications/{$app->id}");
+
+    $response->assertOk();
+    $this->assertDatabaseMissing('applications', ['id' => $app->id]);
+});
+
+it('prevents withdrawal if 30 minutes have passed', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $app = Application::factory()->create([
+        'user_id' => $student->id,
+        'status' => 'pending',
+        'created_at' => now()->subMinutes(31),
+    ]);
+
+    Passport::actingAs($student);
+
+    $response = $this->deleteJson("/api/applications/{$app->id}");
+
+    $response->assertStatus(400)
+        ->assertJson(['message' => 'Time limit exceeded. You can only withdraw your application within the first 30 minutes.']);
+});
+
+it('prevents withdrawal if status is accepted or rejected', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $app = Application::factory()->create([
+        'user_id' => $student->id,
+        'status' => 'accepted',
+        'created_at' => now(),
+    ]);
+
+    Passport::actingAs($student);
+
+    $response = $this->deleteJson("/api/applications/{$app->id}");
+
+    $response->assertStatus(400)
+        ->assertJson(['message' => 'You cannot withdraw an application that has already been processed.']);
+});
