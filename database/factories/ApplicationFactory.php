@@ -22,8 +22,8 @@ class ApplicationFactory extends Factory
         return [
             //'user_id' => User::factory()->create(['role' => 'student']),
             //'offer_id' => Offer::factory(),
-            'status' => fake()->randomElement(['pending', 'read', 'accepted', 'rejected']),
-            'cv_path' => 'cvs/fake_cv_test.pdf',
+            'status' => 'pending',
+            'cv_path' => 'https://example.com/cv.pdf',
         ];
     }
 }

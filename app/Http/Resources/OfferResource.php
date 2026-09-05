@@ -25,6 +25,8 @@ class OfferResource extends JsonResource
             'category'    => $this->whenLoaded('category', function () {
                 return $this->category->name; 
             }),
+
+            'company' => $this->whenLoaded('company', fn() => $this->company->name),
             
             // Formatea fechas para que el frontend no sufra
             'published_at' => $this->created_at->format('d-m-Y'), 

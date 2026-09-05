@@ -21,8 +21,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
         CategorySeeder::class,
         ]);
-    
-        
+
+        $categories = Category::all();
+            
         $empresa = User::factory()->create([
             'name' => 'Tech Solutions SL',
             'email' => 'empresa@test.com',
@@ -30,6 +31,9 @@ class DatabaseSeeder extends Seeder
             'role' => 'company',
         ]);
         $empresas = User::factory(4)->create(['role' => 'company']);
+
+        $empresasCollection = collect([$empresa])
+            ->merge($empresas);
 
         $estudiante = User::factory()->create([
             'name' => 'Juan Estudiante',
@@ -39,22 +43,44 @@ class DatabaseSeeder extends Seeder
         ]);
         $estudiantes = User::factory(9)->create(['role' => 'student']);
 
-        $categories = Category::all();
+        $estudiantesCollection = collect([$estudiante])
+            ->merge($estudiantes);
 
-        $offers = Offer::factory(10)->make()->each(function ($offer) use ($empresa, $empresas, $categories) {
-        $offer->user_id = collect([$empresa])->merge($empresas)->random()->id;
-        $offer->category_id = $categories->random()->id;
-        $offer->save();
-        });
-    
-        Application::factory(15)->make()->each(function ($application) use ($estudiante, $estudiantes, $offers) {
-        $application->user_id = collect([$estudiante])->merge($estudiantes)->random()->id;
-        $application->offer_id = $offers->random()->id;
-        $application->save();
-        });
-        
-        
 
-        
+
+        $offers = Offer::factory(10)->make()->each(function ($offer) use ($empresasCollection, $categories) {
+            $offer->user_id = $empresasCollection->random()->id;
+            $offer->category_id = $categories->random()->id;
+
+            $offer->save();
+        });
+
+        // La migración tiene:         
+        //unique(['user_id', 'offer_id'])         
+        //Por eso no podemos seleccionar estudiante y oferta aleatoriamente sin controlar duplicados         
+        //Generamos todas las combinaciones posibles y escogemos 15
+         
+        $combinations = $estudiantesCollection
+            ->flatMap(function ($student) use ($offers) {
+                return $offers->map(function ($offer) use ($student) {
+                    return [
+                        'user_id' => $student->id,
+                        'offer_id' => $offer->id,
+                    ];
+                });
+            })
+            ->shuffle()
+            ->take(15);
+
+
+        foreach ($combinations as $combination) {
+            Application::factory()->create([
+                'user_id' => $combination['user_id'],
+                'offer_id' => $combination['offer_id'],
+                'status' => 'pending',
+            ]);
+        }
     }
 }
+
+

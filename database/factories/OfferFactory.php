@@ -20,8 +20,8 @@ class OfferFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory()->create(['role' => 'company']), 
-            'category_id' => Category::factory(), 
+            //'user_id' => User::factory()->create(['role' => 'company']), 
+            //'category_id' => Category::factory(), 
             //'category_id' => Category::inRandomOrder()->first()->id,
             'title' => fake()->jobTitle(),
             'description' => fake()->paragraph(),

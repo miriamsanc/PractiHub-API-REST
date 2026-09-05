@@ -12,7 +12,7 @@ class Application extends Model
 
     protected $fillable = ['user_id', 'offer_id', 'status', 'cv_path'];
 
-    public function student()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
