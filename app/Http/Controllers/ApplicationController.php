@@ -81,6 +81,12 @@ class ApplicationController extends Controller
         // Si no es la empresa propietaria de la oferta lanzará un 403 Forbidden
         Gate::authorize('update', $application);
 
+        if ($application->status !== 'read') {
+            return response()->json([
+                'message' => 'Only applications in read status can be accepted or rejected.'
+            ], 400);
+        }
+        
         // Actualiza el estado con el dato validado
         $application->update([
             'status' => $request->validated('status'),
