@@ -65,3 +65,31 @@ it('forbids a student from applying twice to the same offer', function () {
 });
 
 
+it('prevents applying to an inactive offer', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $offer = Offer::factory()->create(['is_active' => false]);
+
+    Passport::actingAs($student);
+
+    $response = $this->postJson("/api/offers/{$offer->id}/applications", [
+        'cv_path' => 'https://example.com/cv.pdf',
+    ]);
+
+    $response->assertStatus(400)
+        ->assertJson(['message' => 'This offer is no longer open']);
+});
+
+it('forbids a company from applying to an offer', function () {
+    $company = User::factory()->create(['role' => 'company']);
+    $offer = Offer::factory()->create(['is_active' => true]);
+
+    Passport::actingAs($company);
+
+    $response = $this->postJson("/api/offers/{$offer->id}/applications", [
+        'cv_path' => 'https://example.com/cv.pdf',
+    ]);
+
+    $response->assertStatus(403);
+});
+
+
