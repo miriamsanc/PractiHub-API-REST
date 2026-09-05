@@ -23,7 +23,7 @@ class ApplicationController extends Controller
             return response()->json(['message' => 'This offer is no longer open'], 400);
         }
 
-        // Evitar inscripciones duplicadas (error 500 de SQL)
+        // Evitar inscripciones duplicadas 
         $alreadyApplied = Application::where('user_id', $request->user()->id)
             ->where('offer_id', $offer->id)
             ->exists();

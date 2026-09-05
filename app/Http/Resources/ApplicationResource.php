@@ -23,7 +23,14 @@ class ApplicationResource extends JsonResource
             'applied_at' => $this->created_at->format('Y-m-d H:i:s'),
 
             // Aqui solo adjunta estos datos si los hemos pedido con el with() en el controlador
-            'student' => $this->whenLoaded('user'),
+            'student' => $this->whenLoaded('user', function () {
+                return [
+                    'id' => $this->user->id,
+                    'name' => $this->user->name,
+                    'email' => $this->user->email,
+                ];
+            }),
+            
             'offer' => new OfferResource($this->whenLoaded('offer')),
         ];
     }

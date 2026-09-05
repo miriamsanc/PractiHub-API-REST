@@ -196,7 +196,7 @@ it('forbids updating status with an invalid value', function () {
         ->assertJsonValidationErrors(['status']);
 });
 
-it('forbids non-owner company or student from updating application status', function () {
+it('forbids another company from updating application status', function () {
     $otherCompany = User::factory()->create(['role' => 'company']);
     $app = Application::factory()->create(['status' => 'pending']);
 
@@ -204,6 +204,23 @@ it('forbids non-owner company or student from updating application status', func
 
     $this->putJson("/api/applications/{$app->id}", ['status' => 'accepted'])
         ->assertStatus(403);
+});
+
+it('forbids a student from updating application status', function () {
+    $student = User::factory()->create(['role' => 'student']);
+
+    $app = Application::factory()->create([
+        'user_id' => $student->id,
+        'status' => 'pending',
+    ]);
+
+    Passport::actingAs($student);
+
+    $response = $this->putJson("/api/applications/{$app->id}", [
+        'status' => 'accepted',
+    ]);
+
+    $response->assertStatus(403);
 });
 
 it('allows student to withdraw application within 30 minutes', function () {
