@@ -103,7 +103,7 @@ class ApplicationController extends Controller
         }
 
         // No se puede retirar si la empresa ya la gestionó
-        if ($application->status !== 'pending' && $application->status !== 'read') {
+        if ($application->status !== 'pending') {
             return response()->json([
                 'message' => 'You cannot withdraw an application that has already been processed.'
             ], 400);
