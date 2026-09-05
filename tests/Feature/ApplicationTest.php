@@ -316,6 +316,58 @@ it('allows the offer owner company to set a valid application status', function 
     'rejected',
 ]);
 
+it('forbids changing a pending application directly to accepted', function () {
+    $company = User::factory()->create(['role' => 'company']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => 'pending',
+    ]);
+
+    Passport::actingAs($company);
+
+    $response = $this->putJson("/api/applications/{$application->id}", [
+        'status' => 'accepted',
+    ]);
+
+    $response->assertStatus(400);
+
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => 'pending',
+    ]);
+});
+
+it('forbids changing a pending application directly to rejected', function () {
+    $company = User::factory()->create(['role' => 'company']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => 'pending',
+    ]);
+
+    Passport::actingAs($company);
+
+    $response = $this->putJson("/api/applications/{$application->id}", [
+        'status' => 'rejected',
+    ]);
+
+    $response->assertStatus(400);
+
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => 'pending',
+    ]);
+});
+
 //DELETE//
 
 it('allows student to withdraw application within 30 minutes', function () {
