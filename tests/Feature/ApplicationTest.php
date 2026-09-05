@@ -28,7 +28,7 @@ it('allows a student to apply for an offer', function () {
     ]);
 });
 
-it('fails to apply when cv_path is missing or not a valid URL', function () {
+it('fails to apply when cv_path is not a valid URL', function () {
     $student = User::factory()->create(['role' => 'student']);
     $offer = Offer::factory()->create(['is_active' => true]);
 
@@ -37,6 +37,18 @@ it('fails to apply when cv_path is missing or not a valid URL', function () {
     $response = $this->postJson("/api/offers/{$offer->id}/applications", [
         'cv_path' => 'invalid-url',
     ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['cv_path']);
+});
+
+it('fails to apply when cv_path is missing', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $offer = Offer::factory()->create(['is_active' => true]);
+
+    Passport::actingAs($student);
+
+    $response = $this->postJson("/api/offers/{$offer->id}/applications", []);
 
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['cv_path']);
