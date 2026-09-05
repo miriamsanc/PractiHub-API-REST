@@ -5,6 +5,7 @@ use App\Models\User;
 use App\Models\Application;
 use Laravel\Passport\Passport;
 
+//CREATE//
 
 it('allows a student to apply for an offer', function () {
     $student = User::factory()->create(['role' => 'student']);
@@ -104,6 +105,8 @@ it('forbids a company from applying to an offer', function () {
     $response->assertStatus(403);
 });
 
+//READ//
+
 it('returns only student own applications', function () {
     $student1 = User::factory()->create(['role' => 'student']);
     $student2 = User::factory()->create(['role' => 'student']);
@@ -160,6 +163,8 @@ it('forbids another user from viewing application detail', function () {
 
     $this->getJson("/api/applications/{$app->id}")->assertStatus(403);
 });
+
+//UPDATE//
 
 it('allows offer owner company to update application status', function () {
     $company = User::factory()->create(['role' => 'company']);
@@ -223,6 +228,8 @@ it('forbids a student from updating application status', function () {
     $response->assertStatus(403);
 });
 
+//DELETE//
+
 it('allows student to withdraw application within 30 minutes', function () {
     $student = User::factory()->create(['role' => 'student']);
     $app = Application::factory()->create([
@@ -270,6 +277,53 @@ it('prevents withdrawal if status is accepted or rejected', function () {
     $response->assertStatus(400)
         ->assertJson(['message' => 'You cannot withdraw an application that has already been processed.']);
 });
+
+it('forbids a student from withdrawing another student application', function () {
+    $owner = User::factory()->create(['role' => 'student']);
+
+    $application = Application::factory()->create([
+        'user_id' => $owner->id,
+        'status' => 'pending',
+    ]);
+
+    $otherStudent = User::factory()->create(['role' => 'student']);
+
+    Passport::actingAs($otherStudent);
+
+    $response = $this->deleteJson("/api/applications/{$application->id}");
+
+    $response->assertStatus(403);
+
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+    ]);
+});
+
+it('prevents withdrawal if application is rejected', function () {
+    $student = User::factory()->create(['role' => 'student']);
+
+    $application = Application::factory()->create([
+        'user_id' => $student->id,
+        'status' => 'rejected',
+        'created_at' => now(),
+    ]);
+
+    Passport::actingAs($student);
+
+    $response = $this->deleteJson("/api/applications/{$application->id}");
+
+    $response->assertStatus(400)
+        ->assertJson([
+            'message' => 'You cannot withdraw an application that has already been processed.',
+        ]);
+
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => 'rejected',
+    ]);
+});
+
+//SHOW//
 
 it('allows offer owner company to view applicants list', function () {
     $company = User::factory()->create(['role' => 'company']);
