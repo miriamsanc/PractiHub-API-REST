@@ -138,4 +138,29 @@ class ApplicationController extends Controller
         return ApplicationResource::collection($applications);
     }
 
+    public function cv(Application $application): JsonResponse
+    {
+        // Solo la empresa propietaria de la oferta puede acceder al CV
+        Gate::authorize('viewCv', $application);
+
+        // Comprobar que existe un CV
+        if (!$application->cv_path) {
+            return response()->json([
+                'message' => 'This application does not have a CV.'
+            ], 404);
+        }
+
+        // Al abrir el CV por primera vez pasa a "read"
+        if ($application->status === 'pending') {
+            $application->update([
+                'status' => 'read',
+            ]);
+        }
+
+        return response()->json([
+            'cv_link' => $application->cv_path,
+            'status' => $application->status,
+        ], 200);
+    }
+
 }
