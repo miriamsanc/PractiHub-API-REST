@@ -32,6 +32,12 @@ class ApplicationPolicy
         return false;
     }
 
+    public function viewCv(User $user, Application $application): bool
+    {
+        return $user->role === 'company'
+            && $user->id === $application->offer->user_id;
+    }
+
     /**
      * Determine whether the user can create models.
      */
