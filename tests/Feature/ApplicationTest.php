@@ -241,3 +241,28 @@ it('prevents withdrawal if status is accepted or rejected', function () {
     $response->assertStatus(400)
         ->assertJson(['message' => 'You cannot withdraw an application that has already been processed.']);
 });
+
+it('allows offer owner company to view applicants list', function () {
+    $company = User::factory()->create(['role' => 'company']);
+    $offer = Offer::factory()->create(['user_id' => $company->id]);
+    Application::factory()->count(3)->create(['offer_id' => $offer->id]);
+
+    Passport::actingAs($company);
+
+    $response = $this->getJson("/api/offers/{$offer->id}/applications");
+
+    $response->assertOk()
+        ->assertJsonCount(3, 'data');
+});
+
+it('forbids unauthorized users from viewing offer applicants list', function () {
+    $company = User::factory()->create(['role' => 'company']);
+    $otherCompany = User::factory()->create(['role' => 'company']);
+    
+    $offer = Offer::factory()->create(['user_id' => $company->id]);
+
+    Passport::actingAs($otherCompany);
+
+    $this->getJson("/api/offers/{$offer->id}/applications")
+        ->assertStatus(403);
+});
