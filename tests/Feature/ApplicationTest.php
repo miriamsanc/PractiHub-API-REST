@@ -204,10 +204,17 @@ it('forbids another user from viewing application detail', function () {
 
 //UPDATE//
 
-it('allows offer owner company to update application status', function () {
+it('allows offer owner company to accept a read application', function () {
     $company = User::factory()->create(['role' => 'company']);
-    $offer = Offer::factory()->create(['user_id' => $company->id]);
-    $app = Application::factory()->create(['offer_id' => $offer->id, 'status' => 'pending']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $app = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => 'read',
+    ]);
 
     Passport::actingAs($company);
 
@@ -295,7 +302,7 @@ it('allows the offer owner company to set a valid application status', function 
 
     $application = Application::factory()->create([
         'offer_id' => $offer->id,
-        'status' => 'pending',
+        'status' => 'read',
     ]);
 
     Passport::actingAs($company);
@@ -311,10 +318,31 @@ it('allows the offer owner company to set a valid application status', function 
         'status' => $status,
     ]);
 })->with([
-    'read',
     'accepted',
     'rejected',
 ]);
+
+it('forbids updating a read application to read', function () {
+    $company = User::factory()->create(['role' => 'company']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => 'read',
+    ]);
+
+    Passport::actingAs($company);
+
+    $response = $this->putJson("/api/applications/{$application->id}", [
+        'status' => 'read',
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['status']);
+});
 
 it('forbids changing a pending application directly to accepted', function () {
     $company = User::factory()->create(['role' => 'company']);
@@ -367,6 +395,36 @@ it('forbids changing a pending application directly to rejected', function () {
         'status' => 'pending',
     ]);
 });
+
+
+it('forbids changing a final application status', function (string $currentStatus, string $newStatus) {
+    $company = User::factory()->create(['role' => 'company']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => $currentStatus,
+    ]);
+
+    Passport::actingAs($company);
+
+    $response = $this->putJson("/api/applications/{$application->id}", [
+        'status' => $newStatus,
+    ]);
+
+    $response->assertStatus(400);
+
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => $currentStatus,
+    ]);
+})->with([
+    ['accepted', 'rejected'],
+    ['rejected', 'accepted'],
+]);
 
 //DELETE//
 
@@ -514,4 +572,330 @@ it('forbids unauthorized users from viewing offer applicants list', function () 
 
     $this->getJson("/api/offers/{$offer->id}/applications")
         ->assertStatus(403);
+});
+
+//CV//
+
+it('allows the offer owner company to access the application CV', function () {
+    $company = User::factory()->create(['role' => 'company']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => 'pending',
+        'cv_path' => 'https://example.com/cv.pdf',
+    ]);
+
+    Passport::actingAs($company);
+
+    $response = $this->getJson(
+        "/api/applications/{$application->id}/cv"
+    );
+
+    $response->assertOk()
+        ->assertJson([
+            'cv_link' => 'https://example.com/cv.pdf',
+            'status' => 'read',
+        ]);
+});
+
+
+it('changes application status from pending to read when company opens the CV', function () {
+    $company = User::factory()->create(['role' => 'company']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => 'pending',
+        'cv_path' => 'https://example.com/cv.pdf',
+    ]);
+
+    Passport::actingAs($company);
+
+    $this->getJson(
+        "/api/applications/{$application->id}/cv"
+    )->assertOk();
+
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => 'read',
+    ]);
+});
+
+
+it('does not change application status when CV is opened and application is already read', function () {
+    $company = User::factory()->create(['role' => 'company']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => 'read',
+        'cv_path' => 'https://example.com/cv.pdf',
+    ]);
+
+    Passport::actingAs($company);
+
+    $response = $this->getJson(
+        "/api/applications/{$application->id}/cv"
+    );
+
+    $response->assertOk()
+        ->assertJson([
+            'cv_link' => 'https://example.com/cv.pdf',
+            'status' => 'read',
+        ]);
+
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => 'read',
+    ]);
+});
+
+
+it('forbids another company from accessing the application CV', function () {
+    $company = User::factory()->create(['role' => 'company']);
+    $otherCompany = User::factory()->create(['role' => 'company']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => 'pending',
+        'cv_path' => 'https://example.com/cv.pdf',
+    ]);
+
+    Passport::actingAs($otherCompany);
+
+    $response = $this->getJson(
+        "/api/applications/{$application->id}/cv"
+    );
+
+    $response->assertStatus(403);
+
+    // Comprobamos que tampoco ha cambiado el estado
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => 'pending',
+    ]);
+});
+
+
+it('forbids a student from accessing the application CV', function () {
+    $company = User::factory()->create(['role' => 'company']);
+    $student = User::factory()->create(['role' => 'student']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'user_id' => $student->id,
+        'offer_id' => $offer->id,
+        'status' => 'pending',
+        'cv_path' => 'https://example.com/cv.pdf',
+    ]);
+
+    Passport::actingAs($student);
+
+    $response = $this->getJson(
+        "/api/applications/{$application->id}/cv"
+    );
+
+    $response->assertStatus(403);
+
+    // El estudiante no debe provocar el cambio pending -> read
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => 'pending',
+    ]);
+});
+
+
+it('returns 404 when application has no CV', function () {
+    $company = User::factory()->create(['role' => 'company']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => 'pending',
+        'cv_path' => null,
+    ]);
+
+    Passport::actingAs($company);
+
+    $response = $this->getJson(
+        "/api/applications/{$application->id}/cv"
+    );
+
+    $response->assertStatus(404)
+        ->assertJson([
+            'message' => 'This application does not have a CV.',
+        ]);
+
+    // Al no existir CV, no debe pasar a read
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => 'pending',
+    ]);
+});
+
+
+it('returns 404 when accessing CV of a non-existent application', function () {
+    $company = User::factory()->create(['role' => 'company']);
+
+    Passport::actingAs($company);
+
+    $response = $this->getJson('/api/applications/999999/cv');
+
+    $response->assertStatus(404);
+});
+
+
+it('does not change accepted application status when company accesses the CV', function () {
+    $company = User::factory()->create(['role' => 'company']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => 'accepted',
+        'cv_path' => 'https://example.com/cv.pdf',
+    ]);
+
+    Passport::actingAs($company);
+
+    $response = $this->getJson(
+        "/api/applications/{$application->id}/cv"
+    );
+
+    $response->assertOk()
+        ->assertJson([
+            'cv_link' => 'https://example.com/cv.pdf',
+            'status' => 'accepted',
+        ]);
+
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => 'accepted',
+    ]);
+});
+
+
+it('does not change rejected application status when company accesses the CV', function () {
+    $company = User::factory()->create(['role' => 'company']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => 'rejected',
+        'cv_path' => 'https://example.com/cv.pdf',
+    ]);
+
+    Passport::actingAs($company);
+
+    $response = $this->getJson(
+        "/api/applications/{$application->id}/cv"
+    );
+
+    $response->assertOk()
+        ->assertJson([
+            'cv_link' => 'https://example.com/cv.pdf',
+            'status' => 'rejected',
+        ]);
+
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => 'rejected',
+    ]);
+});
+
+it('keeps application as read when company opens CV again', function () {
+    $company = User::factory()->create(['role' => 'company']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => 'read',
+        'cv_path' => 'https://example.com/cv.pdf',
+    ]);
+
+    Passport::actingAs($company);
+
+    $this->getJson("/api/applications/{$application->id}/cv")
+        ->assertOk();
+
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => 'read',
+    ]);
+});
+
+it('does not change accepted application back to read when CV is opened', function () {
+    $company = User::factory()->create(['role' => 'company']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => 'accepted',
+        'cv_path' => 'https://example.com/cv.pdf',
+    ]);
+
+    Passport::actingAs($company);
+
+    $this->getJson("/api/applications/{$application->id}/cv")
+        ->assertOk();
+
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => 'accepted',
+    ]);
+});
+
+it('does not change rejected application back to read when CV is opened', function () {
+    $company = User::factory()->create(['role' => 'company']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    $application = Application::factory()->create([
+        'offer_id' => $offer->id,
+        'status' => 'rejected',
+        'cv_path' => 'https://example.com/cv.pdf',
+    ]);
+
+    Passport::actingAs($company);
+
+    $this->getJson("/api/applications/{$application->id}/cv")
+        ->assertOk();
+
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => 'rejected',
+    ]);
 });
