@@ -92,4 +92,59 @@ it('forbids a company from applying to an offer', function () {
     $response->assertStatus(403);
 });
 
+it('returns only student own applications', function () {
+    $student1 = User::factory()->create(['role' => 'student']);
+    $student2 = User::factory()->create(['role' => 'student']);
 
+    $app1 = Application::factory()->create(['user_id' => $student1->id]);
+    Application::factory()->create(['user_id' => $student2->id]);
+
+    Passport::actingAs($student1);
+
+    $response = $this->getJson('/api/applications');
+
+    $response->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.id', $app1->id);
+});
+
+it('returns applications submitted to the company offers', function () {
+    $company1 = User::factory()->create(['role' => 'company']);
+    $company2 = User::factory()->create(['role' => 'company']);
+
+    $offer1 = Offer::factory()->create(['user_id' => $company1->id]);
+    $offer2 = Offer::factory()->create(['user_id' => $company2->id]);
+
+    $app1 = Application::factory()->create(['offer_id' => $offer1->id]);
+    Application::factory()->create(['offer_id' => $offer2->id]);
+
+    Passport::actingAs($company1);
+
+    $response = $this->getJson('/api/applications');
+
+    $response->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.id', $app1->id);
+});
+
+it('allows student or offer owner company to view application detail', function () {
+    $company = User::factory()->create(['role' => 'company']);
+    $student = User::factory()->create(['role' => 'student']);
+    $offer = Offer::factory()->create(['user_id' => $company->id]);
+    $app = Application::factory()->create(['user_id' => $student->id, 'offer_id' => $offer->id]);
+
+    Passport::actingAs($student);
+    $this->getJson("/api/applications/{$app->id}")->assertOk();
+
+    Passport::actingAs($company);
+    $this->getJson("/api/applications/{$app->id}")->assertOk();
+});
+
+it('forbids another user from viewing application detail', function () {
+    $otherStudent = User::factory()->create(['role' => 'student']);
+    $app = Application::factory()->create();
+
+    Passport::actingAs($otherStudent);
+
+    $this->getJson("/api/applications/{$app->id}")->assertStatus(403);
+});
