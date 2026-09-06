@@ -5,18 +5,18 @@ use Laravel\Passport\Passport;
 
 // ENDPOINTS ESTUDIANTE
 // VER PERFIL
-it('allows an authenticated user to view a student profile', function () {
+it('allows an authenticated user to view his own student profile', function () {
     // Aqui crea un estudiante para el test
     $student = User::factory()->create(['role' => 'student']);
     
     // Hace login con un usuario
-    Passport::actingAs(User::factory()->create());
+    Passport::actingAs($student);
 
     $response = $this->getJson("/api/users/{$student->id}");
 
     $response->assertStatus(200)
-             ->assertJsonPath('name', $student->name)
-             ->assertJsonPath('role', 'student');
+             ->assertJsonPath('data.name', $student->name)
+             ->assertJsonPath('data.role', 'student');
 });
 
 it('fails to view a profile if not authenticated', function () {
@@ -41,7 +41,7 @@ it('allows a student to update their own profile', function () {
     ]);
 
     $response->assertStatus(200)
-             ->assertJsonPath('user.name', 'Nombre Actualizado');
+             ->assertJsonPath('data.name', 'Nombre Actualizado');
 
     $this->assertDatabaseHas('users', [
         'id' => $student->id,
@@ -61,6 +61,36 @@ it('forbids a user from updating someone else profile', function () {
     ]);
 
     $response->assertStatus(403); // 403 Forbidden 
+});
+
+it('forbids a company from updating a student profile', function () {
+    $student = User::factory()->create(['role' => 'student']);
+    $company = User::factory()->create(['role' => 'company']);
+
+    Passport::actingAs($company);
+
+    $response = $this->putJson("/api/users/{$student->id}", [
+        'name' => 'Hacked',
+    ]);
+
+    $response->assertStatus(403);
+});
+
+it('does not allow changing user role', function () {
+    $student = User::factory()->create(['role' => 'student']);
+
+    Passport::actingAs($student);
+
+    $response = $this->putJson("/api/users/{$student->id}", [
+        'role' => 'company',
+    ]);
+
+    $response->assertStatus(422);
+
+    $this->assertDatabaseHas('users', [
+        'id' => $student->id,
+        'role' => 'student',
+    ]);
 });
 
 // ELIMINAR CUENTA
