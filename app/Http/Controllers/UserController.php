@@ -11,7 +11,15 @@ use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
-    // Ver perfil 
+    /**
+     * @group Students
+     * 
+     * Get student profile
+     * 
+     * Retrieves the details of a specific student account.
+     * 
+     * @authenticated
+     */ 
     public function show(User $user): UserResource
     {
         // Verificacion que el perfil es de estudiante y no de empresa
@@ -24,7 +32,15 @@ class UserController extends Controller
         return new UserResource($user);
     }
 
-    // Actualizar perfil
+    /**
+     * @group Students
+     * 
+     * Update student profile
+     * 
+     * Modifies the information of the authenticated student.
+     * 
+     * @authenticated
+     */
     public function update(UpdateUserRequest $request, User $user): UserResource
     {
         // Validamos que el endpoint sea el correcto (Estudiante)
@@ -40,7 +56,15 @@ class UserController extends Controller
         return new UserResource($user);
     }
 
-    // Eliminar perfil
+    /**
+     * @group Students
+     * 
+     * Delete student account
+     * 
+     * Permanently removes the authenticated student's account from the database.
+     * 
+     * @authenticated
+     */
     public function destroy(User $user): JsonResponse
     {
         if ($user->role !== 'student') {

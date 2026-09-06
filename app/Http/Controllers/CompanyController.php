@@ -12,10 +12,16 @@ use App\Http\Resources\CompanyRankingResource;
 
 class CompanyController extends Controller
 {
-    
-    // Ranking de empresas ordenado por % de aceptación de sus candidaturas
-    // (solo cuentan candidaturas ya resueltas: accepted/rejected).
-    // Cualquier usuario autenticado puede consultarlo.
+    /**
+     * @group Companies
+     * 
+     * Company Ranking
+     * 
+     * Retrieves a list of companies ordered by their application acceptance rate (highest first).
+     * Excludes companies with no resolved (accepted or rejected) applications.
+     * 
+     * @authenticated
+     */
     public function ranking()
     {
         $companies = User::where('role', 'company')
@@ -43,8 +49,15 @@ class CompanyController extends Controller
         return CompanyRankingResource::collection($companies);
     }
 
-
-    // Ver el perfil de una empresa
+    /**
+     * @group Companies
+     * 
+     * Get company profile
+     * 
+     * Retrieves the details of a specific company account.
+     * 
+     * @authenticated
+     */
     public function show(User $company): CompanyResource
     {
         // Asegurarnos de que el usuario solicitado es una empresa
@@ -56,7 +69,15 @@ class CompanyController extends Controller
         return new CompanyResource($company);
     }
 
-    // Actualizar el perfil
+    /**
+     * @group Companies
+     * 
+     * Update company profile
+     * 
+     * Modifies the information of the authenticated company.
+     * 
+     * @authenticated
+     */
     public function update(UpdateCompanyRequest $request, User $company): CompanyResource
     {
         // Verificamos que el perfil a editar sea una empresa
@@ -73,7 +94,15 @@ class CompanyController extends Controller
         return new CompanyResource($company);
     }
 
-    // Eliminar la empresa
+    /**
+     * @group Companies
+     * 
+     * Delete company account
+     * 
+     * Permanently removes the authenticated company's account from the database.
+     * 
+     * @authenticated
+     */
     public function destroy(User $company): JsonResponse
     {
         if ($company->role !== 'company') {

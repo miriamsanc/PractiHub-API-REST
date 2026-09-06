@@ -13,6 +13,15 @@ use Illuminate\Support\Facades\Gate;
 
 class ApplicationController extends Controller
 {
+    /**
+     * @group Applications
+     * 
+     * Apply to offer
+     * 
+     * Submits a student's application to a specific offer. Allows uploading a CV file.
+     * 
+     * @authenticated
+     */
     public function store(StoreApplicationRequest $request, Offer $offer)
     {
         // Autorización: Llama a Create de ApplicationPolicy (lanza 403 si no es estudiante)
@@ -43,6 +52,15 @@ class ApplicationController extends Controller
         return new ApplicationResource($application);
     }
 
+    /**
+     * @group Applications
+     * 
+     * Get application details
+     * 
+     * Retrieves the details of a specific application.
+     * 
+     * @authenticated
+     */
     public function show(Application $application): ApplicationResource
     {
         Gate::authorize('view', $application);
@@ -50,6 +68,15 @@ class ApplicationController extends Controller
         return new ApplicationResource($application->load(['user', 'offer']));
     }
 
+    /**
+     * @group Applications
+     * 
+     * List user applications
+     * 
+     * Returns a list of all applications made by the authenticated student.
+     * 
+     * @authenticated
+     */
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Application::class);
@@ -75,6 +102,15 @@ class ApplicationController extends Controller
         return ApplicationResource::collection($applications);
     }
     
+    /**
+     * @group Applications
+     * 
+     * Update application status
+     * 
+     * Allows the company that owns the offer to update the status (pending, read, accepted, rejected).
+     * 
+     * @authenticated
+     */
     public function update(UpdateApplicationRequest $request, Application $application): JsonResponse
     {
         // Autorización: Llama a update de ApplicationPolicy
@@ -98,6 +134,15 @@ class ApplicationController extends Controller
         ], 200);
     }
 
+    /**
+     * @group Applications
+     * 
+     * Cancel application
+     * 
+     * Allows a student to withdraw their application.
+     * 
+     * @authenticated
+     */
     public function destroy(Request $request, Application $application): JsonResponse
     {
         // Autorización: Debe ser el estudiante dueño de la candidatura
@@ -124,8 +169,15 @@ class ApplicationController extends Controller
         ], 200);
     }
 
-    //Permite que la empresa vea los estudiantes apuntados a su oferta
-
+    /**
+     * @group Applications
+     * 
+     * List applications by offer
+     * 
+     * Returns all candidates that applied to a specific offer. Only accessible by the company that owns the offer.
+     * 
+     * @authenticated
+     */
     public function byOffer(Request $request, Offer $offer)
     {
         Gate::authorize('viewAnyForOffer', [Application::class,$offer]);
@@ -137,6 +189,15 @@ class ApplicationController extends Controller
         return ApplicationResource::collection($applications);
     }
 
+    /**
+     * @group Applications
+     * 
+     * Download CV
+     * 
+     * Retrieves the CV file uploaded by the student for this specific application.
+     * 
+     * @authenticated
+     */
     public function cv(Application $application): JsonResponse
     {
         // Solo la empresa propietaria de la oferta puede acceder al CV

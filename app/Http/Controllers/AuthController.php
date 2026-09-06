@@ -10,7 +10,17 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
-{
+{    
+    /**
+     * @group Authentication
+     * 
+     * Register user
+     * 
+     * Creates a new account in the system. The role must be either 'student' or 'company'.
+     * 
+     * @unauthenticated
+     */
+
     public function register(Request $request): JsonResponse
     {
         // Validacion de los datos entrantes
@@ -39,6 +49,16 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * @group Authentication
+     * 
+     * Login user
+     * 
+     * Authenticates a user and returns a Passport access token to be used in protected routes.
+     * 
+     * @unauthenticated
+     */
+
     public function login(Request $request): JsonResponse
     {
         $request->validate([
@@ -64,6 +84,15 @@ class AuthController extends Controller
         ], 200);
     }
 
+    /**
+     * @group Authentication
+     * 
+     * Logout user
+     * 
+     * Revokes the current authenticated user's token.
+     * 
+     * @authenticated
+     */
 
     public function logout(Request $request): JsonResponse
     {
