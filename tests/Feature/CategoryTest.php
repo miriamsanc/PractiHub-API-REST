@@ -18,3 +18,9 @@ it('allows authenticated users to list categories', function () {
     $response->assertStatus(200)
              ->assertJsonCount(3);
 });
+
+it('forbids unauthenticated users from listing categories', function () {
+    $response = $this->getJson('/api/categories');
+
+    $response->assertStatus(401);
+});
