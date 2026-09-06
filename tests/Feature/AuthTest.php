@@ -63,6 +63,36 @@ it('fails registration if validation fails', function () {
     $response->assertStatus(422)->assertJsonValidationErrors(['email', 'password', 'role']);
 });
 
+it('fails registration with an already registered email', function () {
+    User::factory()->create([
+        'email' => 'existing@example.com',
+    ]);
+
+    $response = $this->postJson('/api/register', [
+        'name' => 'Test',
+        'email' => 'existing@example.com',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+        'role' => 'student',
+    ]);
+
+    $response->assertStatus(422)
+             ->assertJsonValidationErrors(['email']);
+});
+
+it('fails registration with an invalid role', function () {
+    $response = $this->postJson('/api/register', [
+        'name' => 'Test',
+        'email' => 'test@example.com',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+        'role' => 'admin',
+    ]);
+
+    $response->assertStatus(422)
+             ->assertJsonValidationErrors(['role']);
+});
+
 // Tests de inicio de sesion
 it('logs in an existing user successfully', function () {
     
