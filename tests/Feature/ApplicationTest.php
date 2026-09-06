@@ -202,6 +202,20 @@ it('forbids another user from viewing application detail', function () {
     $this->getJson("/api/applications/{$app->id}")->assertStatus(403);
 });
 
+it('forbids a student from viewing applicants of an offer', function () {
+    $company = User::factory()->create(['role' => 'company']);
+    $student = User::factory()->create(['role' => 'student']);
+
+    $offer = Offer::factory()->create([
+        'user_id' => $company->id,
+    ]);
+
+    Passport::actingAs($student);
+
+    $this->getJson("/api/offers/{$offer->id}/applications")
+        ->assertStatus(403);
+});
+
 //UPDATE//
 
 it('allows offer owner company to accept a read application', function () {
@@ -553,7 +567,7 @@ it('allows offer owner company to view applicants list', function () {
     $company = User::factory()->create(['role' => 'company']);
     $offer = Offer::factory()->create(['user_id' => $company->id]);
     Application::factory()->count(3)->create(['offer_id' => $offer->id]);
-
+    
     Passport::actingAs($company);
 
     $response = $this->getJson("/api/offers/{$offer->id}/applications");
