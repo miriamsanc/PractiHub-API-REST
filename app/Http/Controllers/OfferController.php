@@ -13,7 +13,15 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class OfferController extends Controller
 {
-    // Lista todas las ofertas (con filtros opcionales)
+    /**
+     * @group Offers
+     * 
+     * List offers
+     * 
+     * Returns all internship offers. Supports filtering by category_id or location.
+     * 
+     * @authenticated
+     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $offers = Offer::query()
@@ -37,6 +45,15 @@ class OfferController extends Controller
         return OfferResource::collection($offers);
     }
 
+    /**
+     * @group Offers
+     * 
+     * Get offer details
+     * 
+     * Retrieves the specific details of an internship offer.
+     * 
+     * @authenticated
+     */
     public function show(Offer $offer): OfferResource
     {
         // Autorización (La Policy permite que cualquier usuario autenticado la vea)
@@ -49,7 +66,15 @@ class OfferController extends Controller
         return new OfferResource($offer);
     }
 
-    // Crea una oferta (Solo empresas)
+    /**
+     * @group Offers
+     * 
+     * Create offer
+     * 
+     * Publishes a new internship offer. Only accessible by users with the 'company' role.
+     * 
+     * @authenticated
+     */
     public function store(StoreOfferRequest $request): OfferResource
     {
         // AUTORIZACIÓN: Solo usuarios con rol 'company' pueden crear, validamos permiso con policy, si devuelve false (403)
@@ -62,7 +87,15 @@ class OfferController extends Controller
         
     }
 
-    // Edita una oferta (Solo empresa dueña)
+    /**
+     * @group Offers
+     * 
+     * Update offer
+     * 
+     * Modifies an existing offer. The company can also toggle 'is_active' to close the offer.
+     * 
+     * @authenticated
+     */
     public function update(UpdateOfferRequest $request, Offer $offer): OfferResource
     {
         // AUTORIZACIÓN: Comprobar que el usuario autenticado es el dueño de la oferta(false en policy da 403)
@@ -74,7 +107,15 @@ class OfferController extends Controller
         return new OfferResource($offer);
     }
 
-    // Elimina una oferta (Solo la empresa creadora)
+    /**
+     * @group Offers
+     * 
+     * Delete offer
+     * 
+     * Permanently removes an offer. Only the company that owns the offer can delete it.
+     * 
+     * @authenticated
+     */
     public function destroy(Request $request, Offer $offer): JsonResponse
     {
         // AUTORIZACIÓN: Comprueba que es el propietario

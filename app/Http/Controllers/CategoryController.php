@@ -8,6 +8,15 @@ use Illuminate\Http\JsonResponse;
 
 class CategoryController extends Controller
 {
+    /**
+     * @group Categories
+     * 
+     * List categories
+     * 
+     * Returns all available categories to be used for filtering offers.
+     * 
+     * @authenticated
+     */
     public function index(): JsonResponse
     {
         // Muestra todas las categorias
