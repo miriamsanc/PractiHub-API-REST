@@ -6,49 +6,42 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
+use App\Http\Requests\UpdateCompanyRequest;
+use App\Http\Resources\CompanyResource;
 
 class CompanyController extends Controller
 {
     // Ver el perfil de una empresa
-    public function show(User $company): JsonResponse
+    public function show(User $company): CompanyResource
     {
         // Asegurarnos de que el usuario solicitado es una empresa
         if ($company->role !== 'company') {
-            return response()->json(['message' => 'Company not found'], 404);
+            abort(404, 'Company not found');
         }
         
-        return response()->json($company, 200);
+        
+        return new CompanyResource($company);
     }
 
     // Actualizar el perfil
-    public function update(Request $request, User $company): JsonResponse
+    public function update(UpdateCompanyRequest $request, User $company): CompanyResource
     {
         // Verificamos que el perfil a editar sea una empresa
         if ($company->role !== 'company') {
-            return response()->json(['message' => 'Company not found'], 404);
+            abort(404, 'Company not found');
         }
     
         // AUTORIZACIÓN VÍA POLICY: Solo el dueño de la cuenta puede editarla
         // Si no es el dueño, detiene la ejecución y devuelve un 403.
         Gate::authorize('update', $company);
+        
+        $company->update($request->validated());
 
-        // VALIDACIÓN
-        $validatedData = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $company->id,
-        ]);
-
-        // ACTUALIZACIÓN
-        $company->update($validatedData);
-
-        return response()->json([
-            'message' => 'Company profile updated successfully',
-            'user' => $company
-        ], 200);
+        return new CompanyResource($company);
     }
 
     // Eliminar la empresa
-    public function destroy(Request $request, User $company): JsonResponse
+    public function destroy(User $company): JsonResponse
     {
         if ($company->role !== 'company') {
             return response()->json(['message' => 'Company not found'], 404);

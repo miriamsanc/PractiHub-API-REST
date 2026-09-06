@@ -27,7 +27,7 @@ class UserController extends Controller
     // Actualizar perfil
     public function update(UpdateUserRequest $request, User $user): UserResource
     {
-        // 1. Validamos que el endpoint sea el correcto (Estudiante)
+        // Validamos que el endpoint sea el correcto (Estudiante)
         if ($user->role !== 'student') {
             abort(404, 'Student profile not found');
         }
