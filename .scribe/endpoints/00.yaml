@@ -1,0 +1,183 @@
+name: Authentication
+description: ''
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/register
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: |-
+        Register user
+
+        Creates a new account in the system. The role must be either 'student' or 'company'.
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'Must be a valid email address. Must not be greater than 255 characters.'
+        required: true
+        example: zbailey@example.net
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      password:
+        custom: []
+        name: password
+        description: 'Must be at least 8 characters.'
+        required: true
+        example: '-0pBNvYgxw'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      role:
+        custom: []
+        name: role
+        description: ''
+        required: true
+        example: student
+        type: string
+        enumValues:
+          - student
+          - company
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: b
+      email: zbailey@example.net
+      password: '-0pBNvYgxw'
+      role: student
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/login
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: |-
+        Login user
+
+        Authenticates a user and returns a Passport access token to be used in protected routes.
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        custom: []
+        name: email
+        description: 'Must be a valid email address.'
+        required: true
+        example: gbailey@example.net
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      password:
+        custom: []
+        name: password
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      email: gbailey@example.net
+      password: architecto
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/logout
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: |-
+        Logout user
+
+        Revokes the current authenticated user's token.
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIwMWEwNzg5Yy1hMGJiLTcwODAtYTgxZi1iMWJjZmE3YTMyZDkiLCJqdGkiOiI5MmY4ZjA2MTkxZjZmOGMzYmIyOWRkNTk4NTYxMTg3YTAyOTViZjcwYWQ5MmRhOTc5M2I1NzU5MDEzNjhjZDEyMTAyMjI0OWYyMGZkOGEzZCIsImlhdCI6MTc4ODcyOTk3MC40ODc1MiwibmJmIjoxNzg4NzI5OTcwLjQ4NzUyNCwiZXhwIjoxODIwMjY1OTY5LjgzNTg2OCwic3ViIjoiMSIsInNjb3BlcyI6W119.eLtA3RRsKVxX6BtUmZWp31mVO99HeciLKdm_WrBJdFe5Qm5b_4MjQPn4be43VCR2h0EBF5UA7oWvQRLZnqC8XZmZNW0pSAI73QLvV5X95LHozEePmGkY9_d8Gmwcp6ZWzEBoRriVqsa_-u91WJ5Ok8PROLzUVLmxjOgSf8LyXeyDn8uD_Sgc1vV1H186F4dZD_e4aN9s3flEKg4npvs5RBHklTjkf4BMkIr3wW01OIQ3-5ARc491VELQWfkzkKo1O3D_J_LM0Po_X0LBZTFdrnBQBxLVOz43rIoBLFCOBbM221pIgLI37Fm3MyOHXBl03dOj5Gp_cRyWvB5yYTZvHa97awQARs55ATrC_yR3Zr0vXymKd-H5RqjBcqhthmwP5Ku3wt9P9-XTfxqYhov46gFqJWSaayKwo9xqxU5IHdsfEMG00MqfN_PJqPGhyHDx1cNt6EOpeIkW5BYT8JOqys7ezKXgiV_JU6rx6wsg7YeZGkb20do_0xREnXPlvGJyNZeDvlpoFGU4R7H9H4RA1OJ_KBmtaVUb-dJQG9LS-zjdODik8NDNJZjwjziFktp1Hxct86IQ9RZN1XYwjY8hBLgq8OgAS9Ecc9F1DB6PU5RMczcquG8FqzNEb-GWaT_58iviUD22iLFfyOROEwziQqfusBHhA2kkEcQ_Gln4z18'
+    controller: null
+    method: null
+    route: null

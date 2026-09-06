@@ -1,0 +1,50 @@
+name: Categories
+description: ''
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/categories
+    metadata:
+      custom: []
+      groupName: Categories
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: |-
+        List categories
+
+        Returns all available categories to be used for filtering offers.
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '[{"id":1,"name":"Hazardous Materials Removal Worker","created_at":"2026-08-10T08:59:58.000000Z","updated_at":"2026-08-10T08:59:58.000000Z"},{"id":2,"name":"Agricultural Manager","created_at":"2026-08-10T08:59:58.000000Z","updated_at":"2026-08-10T08:59:58.000000Z"},{"id":3,"name":"Agricultural Equipment Operator","created_at":"2026-08-10T08:59:58.000000Z","updated_at":"2026-08-10T08:59:58.000000Z"},{"id":4,"name":"Insurance Sales Agent","created_at":"2026-08-10T08:59:58.000000Z","updated_at":"2026-08-10T08:59:58.000000Z"},{"id":5,"name":"Bridge Tender OR Lock Tender","created_at":"2026-08-10T08:59:59.000000Z","updated_at":"2026-08-10T08:59:59.000000Z"},{"id":6,"name":"Biophysicist","created_at":"2026-08-10T09:00:01.000000Z","updated_at":"2026-08-10T09:00:01.000000Z"},{"id":7,"name":"Floral Designer","created_at":"2026-08-10T09:00:02.000000Z","updated_at":"2026-08-10T09:00:02.000000Z"},{"id":8,"name":"Central Office Operator","created_at":"2026-08-10T09:00:02.000000Z","updated_at":"2026-08-10T09:00:02.000000Z"},{"id":9,"name":"Community Service Manager","created_at":"2026-08-10T09:00:03.000000Z","updated_at":"2026-08-10T09:00:03.000000Z"},{"id":10,"name":"Command Control Center Officer","created_at":"2026-08-10T09:00:03.000000Z","updated_at":"2026-08-10T09:00:03.000000Z"},{"id":11,"name":"Photographic Reproduction Technician","created_at":"2026-08-10T09:00:04.000000Z","updated_at":"2026-08-10T09:00:04.000000Z"},{"id":12,"name":"Bindery Machine Operator","created_at":"2026-08-10T09:00:04.000000Z","updated_at":"2026-08-10T09:00:04.000000Z"},{"id":13,"name":"Cutting Machine Operator","created_at":"2026-08-10T09:00:05.000000Z","updated_at":"2026-08-10T09:00:05.000000Z"},{"id":14,"name":"Occupational Therapist Aide","created_at":"2026-08-10T09:00:05.000000Z","updated_at":"2026-08-10T09:00:05.000000Z"},{"id":15,"name":"Gluing Machine Operator","created_at":"2026-08-10T09:00:06.000000Z","updated_at":"2026-08-10T09:00:06.000000Z"},{"id":16,"name":"Soil Scientist","created_at":"2026-08-10T09:00:09.000000Z","updated_at":"2026-08-10T09:00:09.000000Z"},{"id":17,"name":"Environmental Science Technician","created_at":"2026-08-10T09:00:10.000000Z","updated_at":"2026-08-10T09:00:10.000000Z"},{"id":18,"name":"Motor Vehicle Operator","created_at":"2026-08-10T09:00:11.000000Z","updated_at":"2026-08-10T09:00:11.000000Z"},{"id":19,"name":"Fish Game Warden","created_at":"2026-08-10T09:00:12.000000Z","updated_at":"2026-08-10T09:00:12.000000Z"},{"id":20,"name":"Infantry","created_at":"2026-08-10T09:00:13.000000Z","updated_at":"2026-08-10T09:00:13.000000Z"},{"id":21,"name":"Plate Finisher","created_at":"2026-08-10T09:00:14.000000Z","updated_at":"2026-08-10T09:00:14.000000Z"},{"id":22,"name":"Auditor","created_at":"2026-08-10T09:00:15.000000Z","updated_at":"2026-08-10T09:00:15.000000Z"},{"id":23,"name":"Government Service Executive","created_at":"2026-08-10T09:00:16.000000Z","updated_at":"2026-08-10T09:00:16.000000Z"},{"id":24,"name":"Pesticide Sprayer","created_at":"2026-08-10T09:00:17.000000Z","updated_at":"2026-08-10T09:00:17.000000Z"},{"id":25,"name":"Orthotist OR Prosthetist","created_at":"2026-08-10T09:00:19.000000Z","updated_at":"2026-08-10T09:00:19.000000Z"},{"id":26,"name":"Home Appliance Installer","created_at":"2026-08-10T09:00:20.000000Z","updated_at":"2026-08-10T09:00:20.000000Z"},{"id":27,"name":"Roofer","created_at":"2026-08-10T09:00:21.000000Z","updated_at":"2026-08-10T09:00:21.000000Z"},{"id":28,"name":"Computer Scientist","created_at":"2026-08-10T09:00:22.000000Z","updated_at":"2026-08-10T09:00:22.000000Z"},{"id":29,"name":"Airfield Operations Specialist","created_at":"2026-08-10T09:00:23.000000Z","updated_at":"2026-08-10T09:00:23.000000Z"},{"id":30,"name":"Civil Drafter","created_at":"2026-08-10T09:00:24.000000Z","updated_at":"2026-08-10T09:00:24.000000Z"}]'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIwMWEwNzg5Yy1hMGJiLTcwODAtYTgxZi1iMWJjZmE3YTMyZDkiLCJqdGkiOiI5MmY4ZjA2MTkxZjZmOGMzYmIyOWRkNTk4NTYxMTg3YTAyOTViZjcwYWQ5MmRhOTc5M2I1NzU5MDEzNjhjZDEyMTAyMjI0OWYyMGZkOGEzZCIsImlhdCI6MTc4ODcyOTk3MC40ODc1MiwibmJmIjoxNzg4NzI5OTcwLjQ4NzUyNCwiZXhwIjoxODIwMjY1OTY5LjgzNTg2OCwic3ViIjoiMSIsInNjb3BlcyI6W119.eLtA3RRsKVxX6BtUmZWp31mVO99HeciLKdm_WrBJdFe5Qm5b_4MjQPn4be43VCR2h0EBF5UA7oWvQRLZnqC8XZmZNW0pSAI73QLvV5X95LHozEePmGkY9_d8Gmwcp6ZWzEBoRriVqsa_-u91WJ5Ok8PROLzUVLmxjOgSf8LyXeyDn8uD_Sgc1vV1H186F4dZD_e4aN9s3flEKg4npvs5RBHklTjkf4BMkIr3wW01OIQ3-5ARc491VELQWfkzkKo1O3D_J_LM0Po_X0LBZTFdrnBQBxLVOz43rIoBLFCOBbM221pIgLI37Fm3MyOHXBl03dOj5Gp_cRyWvB5yYTZvHa97awQARs55ATrC_yR3Zr0vXymKd-H5RqjBcqhthmwP5Ku3wt9P9-XTfxqYhov46gFqJWSaayKwo9xqxU5IHdsfEMG00MqfN_PJqPGhyHDx1cNt6EOpeIkW5BYT8JOqys7ezKXgiV_JU6rx6wsg7YeZGkb20do_0xREnXPlvGJyNZeDvlpoFGU4R7H9H4RA1OJ_KBmtaVUb-dJQG9LS-zjdODik8NDNJZjwjziFktp1Hxct86IQ9RZN1XYwjY8hBLgq8OgAS9Ecc9F1DB6PU5RMczcquG8FqzNEb-GWaT_58iviUD22iLFfyOROEwziQqfusBHhA2kkEcQ_Gln4z18'
+    controller: null
+    method: null
+    route: null

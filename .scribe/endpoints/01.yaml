@@ -1,0 +1,213 @@
+name: Students
+description: ''
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/users/{id}'
+    metadata:
+      custom: []
+      groupName: Students
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: |-
+        Get student profile
+
+        Retrieves the details of a specific student account.
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the user.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+              "message": "Student profile not found"
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          access-control-allow-origin: '*'
+        description: null
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIwMWEwNzg5Yy1hMGJiLTcwODAtYTgxZi1iMWJjZmE3YTMyZDkiLCJqdGkiOiI5MmY4ZjA2MTkxZjZmOGMzYmIyOWRkNTk4NTYxMTg3YTAyOTViZjcwYWQ5MmRhOTc5M2I1NzU5MDEzNjhjZDEyMTAyMjI0OWYyMGZkOGEzZCIsImlhdCI6MTc4ODcyOTk3MC40ODc1MiwibmJmIjoxNzg4NzI5OTcwLjQ4NzUyNCwiZXhwIjoxODIwMjY1OTY5LjgzNTg2OCwic3ViIjoiMSIsInNjb3BlcyI6W119.eLtA3RRsKVxX6BtUmZWp31mVO99HeciLKdm_WrBJdFe5Qm5b_4MjQPn4be43VCR2h0EBF5UA7oWvQRLZnqC8XZmZNW0pSAI73QLvV5X95LHozEePmGkY9_d8Gmwcp6ZWzEBoRriVqsa_-u91WJ5Ok8PROLzUVLmxjOgSf8LyXeyDn8uD_Sgc1vV1H186F4dZD_e4aN9s3flEKg4npvs5RBHklTjkf4BMkIr3wW01OIQ3-5ARc491VELQWfkzkKo1O3D_J_LM0Po_X0LBZTFdrnBQBxLVOz43rIoBLFCOBbM221pIgLI37Fm3MyOHXBl03dOj5Gp_cRyWvB5yYTZvHa97awQARs55ATrC_yR3Zr0vXymKd-H5RqjBcqhthmwP5Ku3wt9P9-XTfxqYhov46gFqJWSaayKwo9xqxU5IHdsfEMG00MqfN_PJqPGhyHDx1cNt6EOpeIkW5BYT8JOqys7ezKXgiV_JU6rx6wsg7YeZGkb20do_0xREnXPlvGJyNZeDvlpoFGU4R7H9H4RA1OJ_KBmtaVUb-dJQG9LS-zjdODik8NDNJZjwjziFktp1Hxct86IQ9RZN1XYwjY8hBLgq8OgAS9Ecc9F1DB6PU5RMczcquG8FqzNEb-GWaT_58iviUD22iLFfyOROEwziQqfusBHhA2kkEcQ_Gln4z18'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+      - PATCH
+    uri: 'api/users/{id}'
+    metadata:
+      custom: []
+      groupName: Students
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: |-
+        Update student profile
+
+        Modifies the information of the authenticated student.
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the user.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'Must be a valid email address. Must not be greater than 255 characters.'
+        required: false
+        example: zbailey@example.net
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      cv_path:
+        custom: []
+        name: cv_path
+        description: ''
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      role:
+        custom: []
+        name: role
+        description: ''
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: b
+      email: zbailey@example.net
+      cv_path: architecto
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIwMWEwNzg5Yy1hMGJiLTcwODAtYTgxZi1iMWJjZmE3YTMyZDkiLCJqdGkiOiI5MmY4ZjA2MTkxZjZmOGMzYmIyOWRkNTk4NTYxMTg3YTAyOTViZjcwYWQ5MmRhOTc5M2I1NzU5MDEzNjhjZDEyMTAyMjI0OWYyMGZkOGEzZCIsImlhdCI6MTc4ODcyOTk3MC40ODc1MiwibmJmIjoxNzg4NzI5OTcwLjQ4NzUyNCwiZXhwIjoxODIwMjY1OTY5LjgzNTg2OCwic3ViIjoiMSIsInNjb3BlcyI6W119.eLtA3RRsKVxX6BtUmZWp31mVO99HeciLKdm_WrBJdFe5Qm5b_4MjQPn4be43VCR2h0EBF5UA7oWvQRLZnqC8XZmZNW0pSAI73QLvV5X95LHozEePmGkY9_d8Gmwcp6ZWzEBoRriVqsa_-u91WJ5Ok8PROLzUVLmxjOgSf8LyXeyDn8uD_Sgc1vV1H186F4dZD_e4aN9s3flEKg4npvs5RBHklTjkf4BMkIr3wW01OIQ3-5ARc491VELQWfkzkKo1O3D_J_LM0Po_X0LBZTFdrnBQBxLVOz43rIoBLFCOBbM221pIgLI37Fm3MyOHXBl03dOj5Gp_cRyWvB5yYTZvHa97awQARs55ATrC_yR3Zr0vXymKd-H5RqjBcqhthmwP5Ku3wt9P9-XTfxqYhov46gFqJWSaayKwo9xqxU5IHdsfEMG00MqfN_PJqPGhyHDx1cNt6EOpeIkW5BYT8JOqys7ezKXgiV_JU6rx6wsg7YeZGkb20do_0xREnXPlvGJyNZeDvlpoFGU4R7H9H4RA1OJ_KBmtaVUb-dJQG9LS-zjdODik8NDNJZjwjziFktp1Hxct86IQ9RZN1XYwjY8hBLgq8OgAS9Ecc9F1DB6PU5RMczcquG8FqzNEb-GWaT_58iviUD22iLFfyOROEwziQqfusBHhA2kkEcQ_Gln4z18'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/users/{id}'
+    metadata:
+      custom: []
+      groupName: Students
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: |-
+        Delete student account
+
+        Permanently removes the authenticated student's account from the database.
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the user.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIwMWEwNzg5Yy1hMGJiLTcwODAtYTgxZi1iMWJjZmE3YTMyZDkiLCJqdGkiOiI5MmY4ZjA2MTkxZjZmOGMzYmIyOWRkNTk4NTYxMTg3YTAyOTViZjcwYWQ5MmRhOTc5M2I1NzU5MDEzNjhjZDEyMTAyMjI0OWYyMGZkOGEzZCIsImlhdCI6MTc4ODcyOTk3MC40ODc1MiwibmJmIjoxNzg4NzI5OTcwLjQ4NzUyNCwiZXhwIjoxODIwMjY1OTY5LjgzNTg2OCwic3ViIjoiMSIsInNjb3BlcyI6W119.eLtA3RRsKVxX6BtUmZWp31mVO99HeciLKdm_WrBJdFe5Qm5b_4MjQPn4be43VCR2h0EBF5UA7oWvQRLZnqC8XZmZNW0pSAI73QLvV5X95LHozEePmGkY9_d8Gmwcp6ZWzEBoRriVqsa_-u91WJ5Ok8PROLzUVLmxjOgSf8LyXeyDn8uD_Sgc1vV1H186F4dZD_e4aN9s3flEKg4npvs5RBHklTjkf4BMkIr3wW01OIQ3-5ARc491VELQWfkzkKo1O3D_J_LM0Po_X0LBZTFdrnBQBxLVOz43rIoBLFCOBbM221pIgLI37Fm3MyOHXBl03dOj5Gp_cRyWvB5yYTZvHa97awQARs55ATrC_yR3Zr0vXymKd-H5RqjBcqhthmwP5Ku3wt9P9-XTfxqYhov46gFqJWSaayKwo9xqxU5IHdsfEMG00MqfN_PJqPGhyHDx1cNt6EOpeIkW5BYT8JOqys7ezKXgiV_JU6rx6wsg7YeZGkb20do_0xREnXPlvGJyNZeDvlpoFGU4R7H9H4RA1OJ_KBmtaVUb-dJQG9LS-zjdODik8NDNJZjwjziFktp1Hxct86IQ9RZN1XYwjY8hBLgq8OgAS9Ecc9F1DB6PU5RMczcquG8FqzNEb-GWaT_58iviUD22iLFfyOROEwziQqfusBHhA2kkEcQ_Gln4z18'
+    controller: null
+    method: null
+    route: null
