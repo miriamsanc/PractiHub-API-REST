@@ -24,7 +24,8 @@ class UpdateCompanyRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $this->route('company')->id,
+            'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . optional($this->route('company'))->id,
+            'role' => 'prohibited',
         ];
     }
 }
