@@ -5,50 +5,43 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\UpdateUserRequest;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
     // Ver perfil 
-    public function show(User $user): JsonResponse
+    public function show(User $user): UserResource
     {
         // Verificacion que el perfil es de estudiante y no de empresa
         if ($user->role !== 'student') {
-            return response()->json(['message' => 'Student profile not found'], 404);
+            abort(404, 'Student profile not found');
         }
 
-        return response()->json($user, 200);
+        Gate::authorize('view', $user);
+
+        return new UserResource($user);
     }
 
     // Actualizar perfil
-    public function update(Request $request, User $user): JsonResponse
+    public function update(UpdateUserRequest $request, User $user): UserResource
     {
-        // 1. Validamos que el endpoint sea el correcto (Estudiante)
+        // Validamos que el endpoint sea el correcto (Estudiante)
         if ($user->role !== 'student') {
-            return response()->json(['message' => 'Not a student profile'], 404);
+            abort(404, 'Student profile not found');
         }
 
         //Uso de la policy (verifica si puede hacer update, si da false devuelve un 403)
         Gate::authorize('update', $user);
-    
-        // Aqui sometimes para que solo valide el campo si se envía en la petición.
-        // En email ignora el ID del usuario actual para la regla unique
-        $validatedData = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $user->id,
-            'cv_path' => 'nullable|string',
-        ]);
+            
+        $user->update($request->validated());
 
-        $user->update($validatedData);
-
-        return response()->json([
-            'message' => 'Profile updated successfully',
-            'user' => $user
-        ], 200);
+        return new UserResource($user);
     }
 
     // Eliminar perfil
-    public function destroy(Request $request, User $user): JsonResponse
+    public function destroy(User $user): JsonResponse
     {
         if ($user->role !== 'student') {
             return response()->json(['message' => 'Not a student profile'], 404);

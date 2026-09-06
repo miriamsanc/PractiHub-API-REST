@@ -20,8 +20,8 @@ class ApplicationFactory extends Factory
     public function definition(): array
     {
         return [
-            //'user_id' => User::factory()->create(['role' => 'student']),
-            //'offer_id' => Offer::factory(),
+            'user_id' => User::factory()->create(['role' => 'student']),
+            'offer_id' => Offer::factory(),
             'status' => 'pending',
             'cv_path' => 'https://example.com/cv.pdf',
         ];

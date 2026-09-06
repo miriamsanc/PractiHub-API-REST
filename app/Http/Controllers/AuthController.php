@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
@@ -33,7 +34,7 @@ class AuthController extends Controller
 
         // Devolvemos la respuesta con código 201 (Created)
         return response()->json([
-            'user' => $user,
+            'user' => new UserResource($user),
             'token' => $token
         ], 201);
     }

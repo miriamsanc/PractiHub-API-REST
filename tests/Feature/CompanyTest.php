@@ -13,8 +13,18 @@ it('allows an authenticated user to view a company profile', function () {
     $response = $this->getJson("/api/companies/{$company->id}");
 
     $response->assertStatus(200)
-             ->assertJsonPath('name', $company->name)
-             ->assertJsonPath('role', 'company');
+             ->assertJsonPath('data.name', $company->name)
+             ->assertJsonPath('data.role', 'company');
+});
+
+it('returns 404 when trying to view a student as a company', function () {
+    $student = User::factory()->create(['role' => 'student']);
+
+    Passport::actingAs(User::factory()->create());
+
+    $response = $this->getJson("/api/companies/{$student->id}");
+
+    $response->assertStatus(404);
 });
 
 // EDITAR PERFIL
@@ -30,7 +40,7 @@ it('allows a company to update their own profile', function () {
     ]);
 
     $response->assertStatus(200)
-             ->assertJsonPath('user.name', 'Empresa Modificada SL');
+             ->assertJsonPath('data.name', 'Empresa Modificada SL');
 
     $this->assertDatabaseHas('users', [
         'id' => $company->id,
@@ -46,6 +56,19 @@ it('forbids a user from updating another company profile', function () {
 
     $response = $this->putJson("/api/companies/{$company->id}", [
         'name' => 'Hacked Company'
+    ]);
+
+    $response->assertStatus(403);
+});
+
+it('forbids a company from updating another company profile', function () {
+    $company = User::factory()->create(['role' => 'company']);
+    $otherCompany = User::factory()->create(['role' => 'company']);
+
+    Passport::actingAs($otherCompany);
+
+    $response = $this->putJson("/api/companies/{$company->id}", [
+        'name' => 'Hacked Company',
     ]);
 
     $response->assertStatus(403);
