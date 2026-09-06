@@ -12,7 +12,7 @@ class StoreOfferRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // HE cambiado a true porque la autorización la manejará la policy
+        return $this->user()->can('create', \App\Models\Offer::class); 
     }
 
     /**
