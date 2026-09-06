@@ -126,12 +126,13 @@ class ApplicationController extends Controller
 
     //Permite que la empresa vea los estudiantes apuntados a su oferta
 
-    public function byOffer(Offer $offer)
+    public function byOffer(Request $request, Offer $offer)
     {
-        // Verificar que la empresa es la propietaria de la oferta
-        Gate::authorize('viewAnyForOffer', $offer);
+        Gate::authorize('viewAnyForOffer', [Application::class,$offer]);
 
-        $applications = $offer->applications()->with('user')->get();
+        $applications = $offer->applications()
+            ->with('user')
+            ->get();
 
         return ApplicationResource::collection($applications);
     }
