@@ -18,8 +18,22 @@ class UserPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, User $model): bool
+    public function view(User $currentUser, User $model): bool
     {
+        // si es estudiante solo puede ver su propio perfil
+        if ($currentUser->role === 'student') {
+            return $currentUser->id === $model->id;
+        }
+
+        // si es empresa solo puede ver a los estudiantes que se han apuntado a sus ofertas
+       
+        if ($currentUser->role === 'company') {
+            // Busca si el estudiante tiene alguna application que la offerta sea de la empresa actual (currentuser)
+            return $model->applications()->whereHas('offer', function ($query) use ($currentUser) {
+                $query->where('user_id', $currentUser->id);
+            })->exists();
+        }
+
         return false;
     }
 
