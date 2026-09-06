@@ -43,11 +43,20 @@ class User extends Authenticatable
 
     public function offers()
     {
-    return $this->hasMany(Offer::class);
+        return $this->hasMany(Offer::class);
     }
 
     public function applications()
     {
-    return $this->hasMany(Application::class);
+        return $this->hasMany(Application::class);
+    }
+
+    public function applicationsReceived()
+    {
+        return $this->hasManyThrough(Application::class, Offer::class, 
+        'user_id',  // FK en offers que apunta a users (empresa)
+        'offer_id',  // FK en applications que apunta a offers
+        'id',   // PK local en users
+        'id'); // PK local en offers
     }
 }

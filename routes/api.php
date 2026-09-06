@@ -17,10 +17,13 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Rutas de Estudiantes (Users)
+    // Rutas de Estudiantes 
     Route::apiResource('users', UserController::class)->only(['show', 'update', 'destroy']);
 
-    // Rutas de Empresas (Companies)
+    // Rutas del ranking(Todas las empresas ordenadas por % de aceptación)
+    Route::get('/companies/ranking', [CompanyController::class, 'ranking']);
+
+    // Rutas de Empresas 
     Route::apiResource('companies', CompanyController::class)->only(['show', 'update', 'destroy']);
 
     // Categorias
