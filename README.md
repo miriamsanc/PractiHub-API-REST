@@ -1,58 +1,144 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
-
-## About Laravel
-
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
+# 🎓 PractiHub API REST
+ 
+API REST desarrollada en Laravel para la gestión de prácticas de estudiantes en empresas. Permite a las empresas publicar ofertas de prácticas y a los estudiantes inscribirse a ellas, con autenticación mediante tokens (Laravel Passport) y control de acceso basado en roles.
+ 
+Proyecto desarrollado como conversión de una aplicación MVC (Sprint 4) a una arquitectura de API REST.
+ 
+## 🛠️ Tecnologías
+ 
+- **PHP** ^8.3
+- **Laravel** ^13.8
+- **Laravel Passport** ^13.0 — autenticación mediante tokens OAuth2
+- **Pest** ^5.0 — testing
+- **SQLite** — base de datos (configurable)
+- **Scribe** — generación automática de documentación de la API
+## ✨ Funcionalidades
+ 
+### Estudiante
+- Registro, inicio y cierre de sesión
+- Ver, editar y eliminar su propio perfil
+- Consultar ofertas de prácticas (con filtro por categoría y ubicación)
+- Inscribirse y desapuntarse de ofertas
+- Consultar el estado de sus candidaturas
+### Empresa
+- Registro, inicio y cierre de sesión
+- Ver, editar y eliminar su propio perfil
+- Publicar, editar y eliminar sus ofertas de prácticas
+- Ver los candidatos inscritos a sus ofertas y consultar su CV
+- Aceptar o rechazar candidaturas
+- Consultar el ranking de empresas por porcentaje de aceptación
+## Recursos principales
+ 
+| Recurso | Descripción |
+|---|---|
+| `users` | Estudiantes y empresas (diferenciados por el campo `role`) |
+| `offers` | Ofertas de prácticas publicadas por empresas |
+| `applications` | Candidaturas de estudiantes a ofertas |
+| `categories` | Categorías para clasificar y filtrar ofertas |
+ 
+## Reglas de negocio destacadas
+ 
+- **Flujo de una candidatura:** `pending` → `read` (al abrir la empresa el CV) → `accepted` / `rejected`. Solo se puede aceptar o rechazar una candidatura que ya esté en estado `read`.
+- **Retirada de candidatura:** el estudiante solo puede retirar una candidatura mientras esté en estado `pending` y dentro de los primeros 30 minutos desde que se creó.
+- **Ranking de empresas:** se calcula el % de aceptación (`accepted / (accepted + rejected) * 100`) contando únicamente candidaturas ya resueltas, sobre todas las ofertas de la empresa (activas e inactivas). Las empresas sin ninguna candidatura resuelta no aparecen en el ranking.
+- **Visibilidad de ofertas:** los estudiantes solo ven ofertas activas; las empresas ven todas las suyas, activas e inactivas.
+## Instalación
+ 
+### Requisitos previos
+- PHP 8.3+
+- Composer
+- [Laravel Herd](https://herd.laravel.com/) (o cualquier entorno equivalente)
+### Pasos
+ 
+1. Clonar el repositorio e instalar dependencias:
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+   git clone <url-del-repositorio>
+   cd PractiHub-API-REST
+   composer install
 ```
-
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+ 
+2. Copiar el archivo de entorno y generar la clave de la aplicación:
+```bash
+   cp .env.example .env
+   php artisan key:generate
+```
+ 
+3. Configurar la base de datos en `.env` (por defecto SQLite):
+```bash
+   touch database/database.sqlite
+```
+ 
+4. Ejecutar las migraciones y poblar la base de datos con datos de ejemplo:
+```bash
+   php artisan migrate --seed
+```
+ 
+5. Instalar Passport y crear un cliente de acceso personal (necesario para poder generar tokens):
+```bash
+   php artisan passport:client --personal
+```
+ 
+6. Levantar el servidor (si no usas Herd, con el servidor embebido de Laravel):
+```bash
+   php artisan serve
+```
+ 
+## Usuarios de prueba (seeder)
+ 
+Tras ejecutar `php artisan migrate --seed`, se crean automáticamente los siguientes usuarios, además de empresas, estudiantes, ofertas y candidaturas aleatorias:
+ 
+| Rol | Email | Contraseña |
+|---|---|---|
+| Empresa | `empresa@test.com` | `password123` |
+| Estudiante | `estudiante@test.com` | `password123` |
+ 
+## Testing
+ 
+El proyecto cuenta con tests funcionales (Pest) que cubren autenticación, autorización por rol, validaciones y las reglas de negocio principales (candidaturas, ranking, etc.):
+ 
+```bash
+php artisan test
+```
+ 
+## Documentación de la API
+ 
+La documentación completa de todos los endpoints (parámetros, ejemplos de petición/respuesta y un explorador interactivo "Try it out") se genera con [Scribe](https://scribe.knuckles.wtf/laravel/):
+ 
+```bash
+php artisan scribe:generate
+```
+ 
+Una vez generada, está disponible en:
+ 
+- **Documentación interactiva:** `/docs`
+- **Colección de Postman:** `storage/app/private/scribe/collection.json`
+- **Especificación OpenAPI:** `storage/app/private/scribe/openapi.yaml`
+## Endpoints principales
+ 
+| Método | Endpoint | Descripción |
+|---|---|---|
+| `POST` | `/api/register` | Registro de estudiante o empresa |
+| `POST` | `/api/login` | Inicio de sesión |
+| `POST` | `/api/logout` | Cierre de sesión |
+| `GET/PUT/DELETE` | `/api/users/{user}` | Perfil de estudiante |
+| `GET/PUT/DELETE` | `/api/companies/{company}` | Perfil de empresa |
+| `GET` | `/api/companies/ranking` | Ranking de empresas por % de aceptación |
+| `GET` | `/api/categories` | Listado de categorías |
+| `GET/POST/PUT/DELETE` | `/api/offers` / `/api/offers/{offer}` | Ofertas de prácticas |
+| `POST` | `/api/offers/{offer}/applications` | Inscribirse a una oferta |
+| `GET` | `/api/offers/{offer}/applications` | Ver candidatos de una oferta (empresa) |
+| `GET/PUT/DELETE` | `/api/applications/{application}` | Detalle / gestión de una candidatura |
+| `GET` | `/api/applications` | Listado de candidaturas propias |
+| `GET` | `/api/applications/{application}/cv` | Ver CV de una candidatura |
+ 
+> Para el listado completo con parámetros y ejemplos, consulta la documentación generada en `/docs`.
+ 
+## Autenticación
+ 
+Todos los endpoints (salvo `register` y `login`) requieren autenticación mediante un token Bearer de Passport:
+ 
+```
+Authorization: Bearer {tu_token}
+```
+ 
+El token se obtiene en la respuesta de `/api/register` o `/api/login`.
