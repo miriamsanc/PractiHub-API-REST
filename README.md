@@ -72,13 +72,18 @@ Built as a conversion of an MVC application (Sprint 4) into a REST API architect
 ```bash
    php artisan migrate --seed
 ```
+5. Make sure SQLite is enabled in your PHP installation. You can check this by running:
+```bash
+    php -m
+```
+Make sure pdo_sqlite and sqlite3 are listed.
  
-5. Install Passport's personal access client (required to be able to issue tokens):
+6. Install Passport's personal access client (required to be able to issue tokens):
 ```bash
    php artisan passport:client --personal
 ```
  
-6. Start the server (use Laravel's built-in server if you're not using Herd):
+7. Start the server (use Laravel's built-in server if you're not using Herd):
 ```bash
    php artisan serve
 ```
