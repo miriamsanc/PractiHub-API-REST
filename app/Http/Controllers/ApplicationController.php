@@ -10,6 +10,8 @@ use App\Http\Requests\StoreApplicationRequest;
 use App\Http\Requests\UpdateApplicationRequest;
 use App\Http\Resources\ApplicationResource;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\Response;
 
 class ApplicationController extends Controller
 {
@@ -40,13 +42,15 @@ class ApplicationController extends Controller
         if ($alreadyApplied) {
             return response()->json(['message' => 'You have already applied to this offer'], 409); // 409 Conflict
         }
+        //Guardamos el archivo en la carpeta privada 'cvs'
+        $path = $request->file('cv')->store('cvs');
 
-        // Crear la inscripción (Usamos los datos validados del FormRequest (el cv_path))
+        // Crear la inscripción (Usamos los datos validados del FormRequest)
         $application = Application::create([
             'user_id' => $request->user()->id,
             'offer_id' => $offer->id,
             'status' => 'pending', 
-            'cv_path' => $request->validated('cv_path'),
+            'cv_path' => $path,
         ]);
 
         return new ApplicationResource($application);
@@ -198,13 +202,13 @@ class ApplicationController extends Controller
      * 
      * @authenticated
      */
-    public function cv(Application $application): JsonResponse
+    public function cv(Application $application)
     {
         // Solo la empresa propietaria de la oferta puede acceder al CV
         Gate::authorize('viewCv', $application);
 
         // Comprobar que existe un CV
-        if (!$application->cv_path) {
+        if (!$application->cv_path || !Storage::exists($application->cv_path)) {
             return response()->json([
                 'message' => 'This application does not have a CV.'
             ], 404);
@@ -217,10 +221,7 @@ class ApplicationController extends Controller
             ]);
         }
 
-        return response()->json([
-            'cv_link' => $application->cv_path,
-            'status' => $application->status,
-        ], 200);
+        return Storage::response($application->cv_path);
     }
 
 }

@@ -23,7 +23,7 @@ class StoreApplicationRequest extends FormRequest
     public function rules(): array
     {
         return [            
-            'cv_path' => 'required|url|max:255',
+            'cv' => 'required|file|mimes:pdf|max:2048',
         ];
     }
 }
