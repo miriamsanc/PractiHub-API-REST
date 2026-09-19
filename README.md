@@ -52,7 +52,7 @@ Built as a conversion of an MVC application (Sprint 4) into a REST API architect
  
 1. Clone the repository and install dependencies:
 ```bash
-   git clone <PractiHub-API-REST>
+   git clone https://github.com/miriamsanc/PractiHub-API-REST.git
    cd PractiHub-API-REST
    composer install
 ```
@@ -62,7 +62,13 @@ Built as a conversion of an MVC application (Sprint 4) into a REST API architect
    cp .env.example .env
    php artisan key:generate
 ```
- 
+Open .env and set:
+```bash
+    APP_URL=http://localhost:8000
+
+    # SQLite (default — no extra setup needed)
+    DB_CONNECTION=sqlite
+ ```
 3. Set up the database in `.env` (SQLite by default):
 ```bash
    touch database/database.sqlite
