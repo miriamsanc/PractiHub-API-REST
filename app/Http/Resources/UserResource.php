@@ -19,7 +19,8 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'role' => $this->role,
-            'cv_path' => $this->cv_path,
+            // Devolvemos true/false para que React sepa si pintar "CV Subido" o "Subir CV"
+            'has_cv' => !empty($this->cv_path),
         ];
     }
 }
