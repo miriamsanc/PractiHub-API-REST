@@ -78,13 +78,12 @@ Open .env and set:
 ```bash
    php artisan migrate --seed
 ```
-5. Make sure SQLite is enabled in your PHP installation. You can check this by running:
+5. Generate Passport encryption keys (required before creating a client, otherwise token issuing/verification will fail):
 ```bash
-    php -m
+    php artisan passport:keys
 ```
-Make sure pdo_sqlite and sqlite3 are listed.
  
-6. Install Passport's personal access client (required to be able to issue tokens):
+8. Install Passport's personal access client (required to be able to issue tokens):
 ```bash
    php artisan passport:client --personal
 ```
