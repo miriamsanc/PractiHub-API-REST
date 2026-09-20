@@ -40,6 +40,9 @@ class UserController extends Controller
      * Update student profile
      * 
      * Modifies the information of the authenticated student.
+     * Note: Because it includes a file upload, you must send a POST request with a `_method=PUT` field in the form-data.
+     * 
+     * @bodyParam cv file optional The student's CV in PDF format.
      * 
      * @authenticated
      */
@@ -89,6 +92,10 @@ class UserController extends Controller
     
         // USO POLICY
         Gate::authorize('delete', $user);
+
+        if ($user->cv_path) {
+            Storage::delete($user->cv_path);
+        }
 
         $user->delete();
 
