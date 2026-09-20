@@ -26,4 +26,34 @@ class Offer extends Model
     {
         return $this->hasMany(Application::class);
     }
+
+    /**
+     * Scope: filtra por category_id exacto (si se proporciona).
+     */
+    public function scopeCategory($query, $categoryId)
+    {
+        return $query->when($categoryId, function ($q) use ($categoryId) {
+            $q->where('category_id', $categoryId);
+        });
+    }
+ 
+    /**
+     * Scope: filtra por ubicación con coincidencia parcial (si se proporciona).
+     */
+    public function scopeLocation($query, $location)
+    {
+        return $query->when($location, function ($q) use ($location) {
+            $q->where('location', 'like', '%' . $location . '%');
+        });
+    }
+ 
+    /**
+     * Scope: si el usuario no es empresa, solo muestra ofertas activas.
+     */
+    public function scopeVisibleTo($query, $user)
+    {
+        return $query->when($user->role !== 'company', function ($q) {
+            $q->where('is_active', true);
+        });
+    }
 }

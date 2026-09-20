@@ -25,23 +25,12 @@ class OfferController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $offers = Offer::query()
-            // Filtro por category_id exacto
-            ->when($request->query('category_id'), function ($query, $categoryId) {
-                $query->where('category_id', $categoryId);
-            })
-            // Filtro por ubicación ( like para que sea mas flexible)
-            ->when($request->query('location'), function ($query, $location) {
-                $query->where('location', 'like', '%' . $location . '%');
-            })
-            // Si no es empresa solo ve las ofertas activas
-            ->when($request->user()->role !== 'company', function ($query) {
-                $query->where('is_active', true);
-            })
-            // traermos los datos de categoria y empresa para que el front tenga mas info
+            ->category($request->query('category_id'))
+            ->location($request->query('location'))
+            ->visibleTo($request->user())
             ->with(['category', 'company']) 
             ->get();
-            
-        
+                    
         return OfferResource::collection($offers);
     }
 
