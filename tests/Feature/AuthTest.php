@@ -14,8 +14,8 @@ it('registers a user successfully as student', function () {
     $data = [
         'name' => 'Juan',
         'email' => 'juan@example.com',
-        'password' => 'password123',
-        'password_confirmation' => 'password123',
+        'password' => 'Password123!',
+        'password_confirmation' => 'Password123!',
         'role' => 'student',
     ];
 
@@ -37,8 +37,8 @@ it('registers a user successfully as company', function () {
     $data = [
         'name' => 'Empresa Tech',
         'email' => 'contacto@empresa.com',
-        'password' => 'password123',
-        'password_confirmation' => 'password123',
+        'password' => 'Password123!',
+        'password_confirmation' => 'Password123!',
         'role' => 'company',
     ];
 
@@ -71,8 +71,8 @@ it('fails registration with an already registered email', function () {
     $response = $this->postJson('/api/register', [
         'name' => 'Test',
         'email' => 'existing@example.com',
-        'password' => 'password123',
-        'password_confirmation' => 'password123',
+        'password' => 'Password123!',
+        'password_confirmation' => 'Password123!',
         'role' => 'student',
     ]);
 
@@ -84,8 +84,8 @@ it('fails registration with an invalid role', function () {
     $response = $this->postJson('/api/register', [
         'name' => 'Test',
         'email' => 'test@example.com',
-        'password' => 'password123',
-        'password_confirmation' => 'password123',
+        'password' => 'Password123!',
+        'password_confirmation' => 'Password123!',
         'role' => 'admin',
     ]);
 
@@ -98,12 +98,12 @@ it('logs in an existing user successfully', function () {
     
     $user = User::factory()->create([
         'email' => 'login@example.com',
-        'password' => bcrypt('password123'), // Aqui se encripta la contraseña
+        'password' => bcrypt('Password123!'), // Aqui se encripta la contraseña
     ]);
 
     $data = [
         'email' => 'login@example.com',
-        'password' => 'password123',
+        'password' => 'Password123!',
     ];
 
     $response = $this->postJson('/api/login', $data);
@@ -114,7 +114,7 @@ it('logs in an existing user successfully', function () {
 it('fails login with incorrect credentials', function () {
     $user = User::factory()->create([
         'email' => 'login@example.com',
-        'password' => bcrypt('password123'),
+        'password' => bcrypt('Password123!'),
     ]);
 
     $data = [
