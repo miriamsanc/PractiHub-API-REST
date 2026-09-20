@@ -23,7 +23,7 @@ class ApplicationFactory extends Factory
             'user_id' => User::factory()->create(['role' => 'student']),
             'offer_id' => Offer::factory(),
             'status' => 'pending',
-            'cv_path' => 'https://example.com/cv.pdf',
+            'cv_path' => 'cvs/fake-cv.pdf',
         ];
     }
 }
