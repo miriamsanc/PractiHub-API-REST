@@ -72,19 +72,13 @@
                 </li>
                                     <ul id="tocify-subheader-authentication" class="tocify-subheader">
                                                     <li class="tocify-item level-2" data-unique="authentication-POSTapi-register">
-                                <a href="#authentication-POSTapi-register">Register user
-
-Creates a new account in the system. The role must be either 'student' or 'company'.</a>
+                                <a href="#authentication-POSTapi-register">Register user</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="authentication-POSTapi-login">
-                                <a href="#authentication-POSTapi-login">Login user
-
-Authenticates a user and returns a Passport access token to be used in protected routes.</a>
+                                <a href="#authentication-POSTapi-login">Login user</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="authentication-POSTapi-logout">
-                                <a href="#authentication-POSTapi-logout">Logout user
-
-Revokes the current authenticated user's token.</a>
+                                <a href="#authentication-POSTapi-logout">Logout user</a>
                             </li>
                                                                         </ul>
                             </ul>
@@ -101,7 +95,8 @@ Retrieves the details of a specific student account.</a>
                                                                                 <li class="tocify-item level-2" data-unique="students-PUTapi-users--id-">
                                 <a href="#students-PUTapi-users--id-">Update student profile
 
-Modifies the information of the authenticated student.</a>
+Modifies the information of the authenticated student.
+Note: Because it includes a file upload, you must send a POST request with a `_method=PUT` field in the form-data.</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="students-DELETEapi-users--id-">
                                 <a href="#students-DELETEapi-users--id-">Delete student account
@@ -233,7 +228,7 @@ Returns all candidates that applied to a specific offer. Only accessible by the 
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: September 6, 2026</li>
+        <li>Last updated: September 20, 2026</li>
     </ul>
 </div>
 
@@ -256,16 +251,14 @@ You can switch the language used with the tabs at the top right (or from the nav
 
         <h1 id="authentication">Authentication</h1>
 
-    
+    <p>Public endpoints for registration, login and logout via Passport (Bearer Token).</p>
 
-                                <h2 id="authentication-POSTapi-register">Register user
-
-Creates a new account in the system. The role must be either &#039;student&#039; or &#039;company&#039;.</h2>
+                                <h2 id="authentication-POSTapi-register">Register user</h2>
 
 <p>
 </p>
 
-
+<p>Creates a new account in the system. The role must be either 'student' or 'company'.</p>
 
 <span id="example-requests-POSTapi-register">
 <blockquote>Example request:</blockquote>
@@ -279,7 +272,7 @@ Creates a new account in the system. The role must be either &#039;student&#039;
     --data "{
     \"name\": \"b\",
     \"email\": \"zbailey@example.net\",
-    \"password\": \"-0pBNvYgxw\",
+    \"password\": \"|]|{+-\",
     \"role\": \"student\"
 }"
 </code></pre></div>
@@ -298,7 +291,7 @@ const headers = {
 let body = {
     "name": "b",
     "email": "zbailey@example.net",
-    "password": "-0pBNvYgxw",
+    "password": "|]|{+-",
     "role": "student"
 };
 
@@ -415,10 +408,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="password"                data-endpoint="POSTapi-register"
-               value="-0pBNvYgxw"
+               value="|]|{+-"
                data-component="body">
     <br>
-<p>Must be at least 8 characters. Example: <code>-0pBNvYgxw</code></p>
+<p>Example: <code>|]|{+-</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>role</code></b>&nbsp;&nbsp;
@@ -436,14 +429,12 @@ Must be one of:
         </div>
         </form>
 
-                    <h2 id="authentication-POSTapi-login">Login user
-
-Authenticates a user and returns a Passport access token to be used in protected routes.</h2>
+                    <h2 id="authentication-POSTapi-login">Login user</h2>
 
 <p>
 </p>
 
-
+<p>Authenticates a user and returns a Passport access token to be used in protected routes.</p>
 
 <span id="example-requests-POSTapi-login">
 <blockquote>Example request:</blockquote>
@@ -456,7 +447,7 @@ Authenticates a user and returns a Passport access token to be used in protected
     --header "Accept: application/json" \
     --data "{
     \"email\": \"gbailey@example.net\",
-    \"password\": \"architecto\"
+    \"password\": \"|]|{+-\"
 }"
 </code></pre></div>
 
@@ -473,7 +464,7 @@ const headers = {
 
 let body = {
     "email": "gbailey@example.net",
-    "password": "architecto"
+    "password": "|]|{+-"
 };
 
 fetch(url, {
@@ -577,22 +568,20 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="password"                data-endpoint="POSTapi-login"
-               value="architecto"
+               value="|]|{+-"
                data-component="body">
     <br>
-<p>Example: <code>architecto</code></p>
+<p>Example: <code>|]|{+-</code></p>
         </div>
         </form>
 
-                    <h2 id="authentication-POSTapi-logout">Logout user
-
-Revokes the current authenticated user&#039;s token.</h2>
+                    <h2 id="authentication-POSTapi-logout">Logout user</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
 </p>
 
-
+<p>Revokes the current authenticated user's token.</p>
 
 <span id="example-requests-POSTapi-logout">
 <blockquote>Example request:</blockquote>
@@ -875,7 +864,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
                     <h2 id="students-PUTapi-users--id-">Update student profile
 
-Modifies the information of the authenticated student.</h2>
+Modifies the information of the authenticated student.
+Note: Because it includes a file upload, you must send a POST request with a `_method=PUT` field in the form-data.</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
@@ -891,14 +881,11 @@ Modifies the information of the authenticated student.</h2>
     <pre><code class="language-bash">curl --request PUT \
     "http://practihub-api-rest.test/api/users/1" \
     --header "Authorization: Bearer {YOUR_AUTH_KEY}" \
-    --header "Content-Type: application/json" \
+    --header "Content-Type: multipart/form-data" \
     --header "Accept: application/json" \
-    --data "{
-    \"name\": \"b\",
-    \"email\": \"zbailey@example.net\",
-    \"cv_path\": \"architecto\"
-}"
-</code></pre></div>
+    --form "name=b"\
+    --form "email=zbailey@example.net"\
+    --form "cv=@C:\Users\Miriam\AppData\Local\Temp\php778B.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -908,20 +895,19 @@ Modifies the information of the authenticated student.</h2>
 
 const headers = {
     "Authorization": "Bearer {YOUR_AUTH_KEY}",
-    "Content-Type": "application/json",
+    "Content-Type": "multipart/form-data",
     "Accept": "application/json",
 };
 
-let body = {
-    "name": "b",
-    "email": "zbailey@example.net",
-    "cv_path": "architecto"
-};
+const body = new FormData();
+body.append('name', 'b');
+body.append('email', 'zbailey@example.net');
+body.append('cv', document.querySelector('input[name="cv"]').files[0]);
 
 fetch(url, {
     method: "PUT",
     headers,
-    body: JSON.stringify(body),
+    body,
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
@@ -946,7 +932,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <form id="form-PUTapi-users--id-" data-method="PUT"
       data-path="api/users/{id}"
       data-authed="1"
-      data-hasfiles="0"
+      data-hasfiles="1"
       data-isarraybody="0"
       autocomplete="off"
       onsubmit="event.preventDefault(); executeTryOut('PUTapi-users--id-', this);">
@@ -998,10 +984,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="Content-Type"                data-endpoint="PUTapi-users--id-"
-               value="application/json"
+               value="multipart/form-data"
                data-component="header">
     <br>
-<p>Example: <code>application/json</code></p>
+<p>Example: <code>multipart/form-data</code></p>
             </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
@@ -1054,16 +1040,16 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Must be a valid email address. Must not be greater than 255 characters. Example: <code>zbailey@example.net</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>cv_path</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
+            <b style="line-height: 2;"><code>cv</code></b>&nbsp;&nbsp;
+<small>file</small>&nbsp;
 <i>optional</i> &nbsp;
  &nbsp;
-                <input type="text" style="display: none"
-                              name="cv_path"                data-endpoint="PUTapi-users--id-"
-               value="architecto"
+                <input type="file" style="display: none"
+                              name="cv"                data-endpoint="PUTapi-users--id-"
+               value=""
                data-component="body">
     <br>
-<p>Example: <code>architecto</code></p>
+<p>optional The student's CV in PDF format. Example: <code>C:\Users\Miriam\AppData\Local\Temp\php778B.tmp</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>role</code></b>&nbsp;&nbsp;
@@ -3437,12 +3423,9 @@ Submits a student&#039;s application to a specific offer. Allows uploading a CV 
     <pre><code class="language-bash">curl --request POST \
     "http://practihub-api-rest.test/api/offers/1/applications" \
     --header "Authorization: Bearer {YOUR_AUTH_KEY}" \
-    --header "Content-Type: application/json" \
+    --header "Content-Type: multipart/form-data" \
     --header "Accept: application/json" \
-    --data "{
-    \"cv_path\": \"b\"
-}"
-</code></pre></div>
+    --form "cv=@C:\Users\Miriam\AppData\Local\Temp\php7829.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -3452,18 +3435,17 @@ Submits a student&#039;s application to a specific offer. Allows uploading a CV 
 
 const headers = {
     "Authorization": "Bearer {YOUR_AUTH_KEY}",
-    "Content-Type": "application/json",
+    "Content-Type": "multipart/form-data",
     "Accept": "application/json",
 };
 
-let body = {
-    "cv_path": "b"
-};
+const body = new FormData();
+body.append('cv', document.querySelector('input[name="cv"]').files[0]);
 
 fetch(url, {
     method: "POST",
     headers,
-    body: JSON.stringify(body),
+    body,
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
@@ -3488,7 +3470,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <form id="form-POSTapi-offers--offer_id--applications" data-method="POST"
       data-path="api/offers/{offer_id}/applications"
       data-authed="1"
-      data-hasfiles="0"
+      data-hasfiles="1"
       data-isarraybody="0"
       autocomplete="off"
       onsubmit="event.preventDefault(); executeTryOut('POSTapi-offers--offer_id--applications', this);">
@@ -3536,10 +3518,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="Content-Type"                data-endpoint="POSTapi-offers--offer_id--applications"
-               value="application/json"
+               value="multipart/form-data"
                data-component="header">
     <br>
-<p>Example: <code>application/json</code></p>
+<p>Example: <code>multipart/form-data</code></p>
             </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
@@ -3568,16 +3550,16 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                             <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
         <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>cv_path</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
+            <b style="line-height: 2;"><code>cv</code></b>&nbsp;&nbsp;
+<small>file</small>&nbsp;
  &nbsp;
  &nbsp;
-                <input type="text" style="display: none"
-                              name="cv_path"                data-endpoint="POSTapi-offers--offer_id--applications"
-               value="b"
+                <input type="file" style="display: none"
+                              name="cv"                data-endpoint="POSTapi-offers--offer_id--applications"
+               value=""
                data-component="body">
     <br>
-<p>Must be a valid URL. Must not be greater than 255 characters. Example: <code>b</code></p>
+<p>The student's CV in PDF format (Max: 2MB). Example: <code>C:\Users\Miriam\AppData\Local\Temp\php7829.tmp</code></p>
         </div>
         </form>
 
@@ -4201,7 +4183,7 @@ Allows the company that owns the offer to update the status (pending, read, acce
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"status\": \"rejected\"
+    \"status\": \"accepted\"
 }"
 </code></pre></div>
 
@@ -4218,7 +4200,7 @@ const headers = {
 };
 
 let body = {
-    "status": "rejected"
+    "status": "accepted"
 };
 
 fetch(url, {
@@ -4335,10 +4317,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="status"                data-endpoint="PUTapi-applications--application_id-"
-               value="rejected"
+               value="accepted"
                data-component="body">
     <br>
-<p>Example: <code>rejected</code></p>
+<p>Example: <code>accepted</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>accepted</code></li> <li><code>rejected</code></li></ul>
         </div>

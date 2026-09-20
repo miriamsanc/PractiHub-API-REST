@@ -21,7 +21,7 @@ endpoints:
       deprecated: false
     headers:
       Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
+      Content-Type: multipart/form-data
       Accept: application/json
     urlParameters:
       offer_id:
@@ -40,20 +40,20 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      cv_path:
+      cv:
         custom: []
-        name: cv_path
-        description: 'Must be a valid URL. Must not be greater than 255 characters.'
+        name: cv
+        description: "The student's CV in PDF format (Max: 2MB)."
         required: true
-        example: b
-        type: string
+        example: null
+        type: file
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-    cleanBodyParameters:
-      cv_path: b
-    fileParameters: []
+    cleanBodyParameters: []
+    fileParameters:
+      cv: null
     responses: []
     responseFields: []
     auth:
@@ -328,7 +328,7 @@ endpoints:
         name: status
         description: ''
         required: true
-        example: rejected
+        example: accepted
         type: string
         enumValues:
           - accepted
@@ -337,7 +337,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      status: rejected
+      status: accepted
     fileParameters: []
     responses: []
     responseFields: []

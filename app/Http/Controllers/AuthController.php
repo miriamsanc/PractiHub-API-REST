@@ -5,15 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @group Authentication
+ *
+ * Public endpoints for registration, login and logout via Passport (Bearer Token).
+ */
+
 class AuthController extends Controller
 {    
-    /**
-     * @group Authentication
-     * 
+    /** 
      * Register user
      * 
      * Creates a new account in the system. The role must be either 'student' or 'company'.
@@ -21,15 +27,10 @@ class AuthController extends Controller
      * @unauthenticated
      */
 
-    public function register(Request $request): JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
-        // Validacion de los datos entrantes
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:student,company',
-        ]);
+        // Validacion de los datos entrantes en registerrequest
+        $validatedData = $request->validated();
 
         // Creacion usuario encriptando contraseña
         $user = User::create([
@@ -50,8 +51,6 @@ class AuthController extends Controller
     }
 
     /**
-     * @group Authentication
-     * 
      * Login user
      * 
      * Authenticates a user and returns a Passport access token to be used in protected routes.
@@ -59,34 +58,27 @@ class AuthController extends Controller
      * @unauthenticated
      */
 
-    public function login(Request $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
         // Comprobacion credenciales
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (!Auth::attempt($request->validated())) {
             return response()->json([
                 'message' => 'Invalid credentials'
             ], 401);
         }
 
         // Si es correcto obtiene el usuario y genera token
-        $user = User::where('email', $request->email)->firstOrFail();
+        $user = User::where('email', $request->validated('email'))->firstOrFail();
         $token = $user->createToken('auth_token')->accessToken;
 
         // Devuelve respuesta con código 200 (OK)
         return response()->json([
-            'user' => $user,
+            'user' => new UserResource($user),
             'token' => $token
         ], 200);
     }
 
     /**
-     * @group Authentication
-     * 
      * Logout user
      * 
      * Revokes the current authenticated user's token.

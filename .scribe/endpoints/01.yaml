@@ -79,12 +79,13 @@ endpoints:
         Update student profile
 
         Modifies the information of the authenticated student.
+        Note: Because it includes a file upload, you must send a POST request with a `_method=PUT` field in the form-data.
       description: ''
       authenticated: true
       deprecated: false
     headers:
       Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
+      Content-Type: multipart/form-data
       Accept: application/json
     urlParameters:
       id:
@@ -125,13 +126,13 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      cv_path:
+      cv:
         custom: []
-        name: cv_path
-        description: ''
+        name: cv
+        description: "optional The student's CV in PDF format."
         required: false
-        example: architecto
-        type: string
+        example: null
+        type: file
         enumValues: []
         exampleWasSpecified: false
         nullable: true
@@ -150,8 +151,8 @@ endpoints:
     cleanBodyParameters:
       name: b
       email: zbailey@example.net
-      cv_path: architecto
-    fileParameters: []
+    fileParameters:
+      cv: null
     responses: []
     responseFields: []
     auth:

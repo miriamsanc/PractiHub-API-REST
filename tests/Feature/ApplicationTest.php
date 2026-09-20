@@ -4,46 +4,58 @@ use App\Models\Offer;
 use App\Models\User;
 use App\Models\Application;
 use Laravel\Passport\Passport;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 //CREATE//
 
 it('allows a student to apply for an offer', function () {
+    Storage::fake('local');
+
     $student = User::factory()->create(['role' => 'student']);
     $offer = Offer::factory()->create(['is_active' => true]);
 
     Passport::actingAs($student);
 
     $response = $this->postJson("/api/offers/{$offer->id}/applications", [
-        'cv_path' => 'https://example.com/cv.pdf',
+        'cv' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
     ]);
     //metodo aux que equivale al 201
     $response->assertCreated()
-        ->assertJsonPath('data.status', 'pending')
-        ->assertJsonPath('data.cv_link', 'https://example.com/cv.pdf');
+        ->assertJsonPath('data.status', 'pending');
 
+    $application = Application::first();
+ 
+    // El link del CV apunta al endpoint de descarga, no a un fichero literal
+    $response->assertJsonPath('data.cv_link', url("/api/applications/{$application->id}/cv"));
+        
     $this->assertDatabaseHas('applications', [
         'user_id' => $student->id,
         'offer_id' => $offer->id,
         'status' => 'pending',
-        'cv_path' => 'https://example.com/cv.pdf',
     ]);
+
+    // El fichero debe haberse guardado de verdad en el disco (fake) de storage
+    Storage::disk('local')->assertExists($application->cv_path);
 });
 
-it('fails to apply when cv_path is not a valid URL', function () {
+it('fails to apply when cv is not a pdf file', function () {
+    Storage::fake('local');
+
     $student = User::factory()->create(['role' => 'student']);
     $offer = Offer::factory()->create(['is_active' => true]);
 
     Passport::actingAs($student);
 
     $response = $this->postJson("/api/offers/{$offer->id}/applications", [
-        'cv_path' => 'invalid-url',
+        'cv' => UploadedFile::fake()->create('cv.txt', 10, 'text/plain'),
     ]);
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['cv_path']);
+        ->assertJsonValidationErrors(['cv']);
 });
 
-it('fails to apply when cv_path is missing', function () {
+it('fails to apply when cv file is missing', function () {
     $student = User::factory()->create(['role' => 'student']);
     $offer = Offer::factory()->create(['is_active' => true]);
 
@@ -52,27 +64,30 @@ it('fails to apply when cv_path is missing', function () {
     $response = $this->postJson("/api/offers/{$offer->id}/applications", []);
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['cv_path']);
+        ->assertJsonValidationErrors(['cv']);
 });
 
-it('fails when cv_path exceeds 255 characters', function () {
+it('fails when cv file exceeds the size limit', function () {
+    Storage::fake('local');
+
     $student = User::factory()->create(['role' => 'student']);
     $offer = Offer::factory()->create(['is_active' => true]);
 
     Passport::actingAs($student);
 
-    $cvPath = 'https://example.com/' . str_repeat('a', 250);
-
+    // El límite es 2048 KB (2MB); generamos un PDF falso de 3000 KB
     $response = $this->postJson("/api/offers/{$offer->id}/applications", [
-        'cv_path' => $cvPath,
+        'cv' => UploadedFile::fake()->create('cv.pdf', 3000, 'application/pdf'),
     ]);
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['cv_path']);
+        ->assertJsonValidationErrors(['cv']);
 });
 
 
 it('forbids a student from applying twice to the same offer', function () {
+    Storage::fake('local');
+
     $student = User::factory()->create(['role' => 'student']);
     $offer = Offer::factory()->create(['is_active' => true]);
 
@@ -85,7 +100,7 @@ it('forbids a student from applying twice to the same offer', function () {
     Passport::actingAs($student);
 
     $response = $this->postJson("/api/offers/{$offer->id}/applications", [
-        'cv_path' => 'https://example.com/cv.pdf',
+        'cv' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
     ]);
 
     $response->assertStatus(409)
@@ -95,13 +110,15 @@ it('forbids a student from applying twice to the same offer', function () {
 
 
 it('prevents applying to an inactive offer', function () {
+    Storage::fake('local');
+
     $student = User::factory()->create(['role' => 'student']);
     $offer = Offer::factory()->create(['is_active' => false]);
 
     Passport::actingAs($student);
 
     $response = $this->postJson("/api/offers/{$offer->id}/applications", [
-        'cv_path' => 'https://example.com/cv.pdf',
+        'cv' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
     ]);
 
     $response->assertStatus(400)
@@ -109,13 +126,15 @@ it('prevents applying to an inactive offer', function () {
 });
 
 it('forbids a company from applying to an offer', function () {
+    Storage::fake('local');
+
     $company = User::factory()->create(['role' => 'company']);
     $offer = Offer::factory()->create(['is_active' => true]);
 
     Passport::actingAs($company);
 
     $response = $this->postJson("/api/offers/{$offer->id}/applications", [
-        'cv_path' => 'https://example.com/cv.pdf',
+        'cv' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
     ]);
 
     $response->assertStatus(403);
@@ -127,7 +146,7 @@ it('returns 404 when applying to a non-existent offer', function () {
     Passport::actingAs($student);
 
     $response = $this->postJson('/api/offers/999999/applications', [
-        'cv_path' => 'https://example.com/cv.pdf',
+        'cv' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
     ]);
 
     $response->assertStatus(404);
@@ -591,6 +610,9 @@ it('forbids unauthorized users from viewing offer applicants list', function () 
 //CV//
 
 it('allows the offer owner company to access the application CV', function () {
+    Storage::fake('local');
+    Storage::disk('local')->put('cvs/fake-cv.pdf', 'contenido de prueba');
+
     $company = User::factory()->create(['role' => 'company']);
 
     $offer = Offer::factory()->create([
@@ -600,7 +622,7 @@ it('allows the offer owner company to access the application CV', function () {
     $application = Application::factory()->create([
         'offer_id' => $offer->id,
         'status' => 'pending',
-        'cv_path' => 'https://example.com/cv.pdf',
+        'cv_path' => 'cvs/fake-cv.pdf',
     ]);
 
     Passport::actingAs($company);
@@ -609,15 +631,21 @@ it('allows the offer owner company to access the application CV', function () {
         "/api/applications/{$application->id}/cv"
     );
 
-    $response->assertOk()
-        ->assertJson([
-            'cv_link' => 'https://example.com/cv.pdf',
-            'status' => 'read',
-        ]);
+    $response->assertOk(); 
+    
+    // Storage::response() sirve el fichero directamente (no JSON),
+    // así que comprobamos la respuesta y el cambio de estado en BD.
+    $this->assertDatabaseHas('applications', [
+        'id' => $application->id,
+        'status' => 'read',
+    ]);
 });
 
 
 it('changes application status from pending to read when company opens the CV', function () {
+    Storage::fake('local');
+    Storage::disk('local')->put('cvs/fake-cv.pdf', 'contenido de prueba');
+
     $company = User::factory()->create(['role' => 'company']);
 
     $offer = Offer::factory()->create([
@@ -627,7 +655,7 @@ it('changes application status from pending to read when company opens the CV', 
     $application = Application::factory()->create([
         'offer_id' => $offer->id,
         'status' => 'pending',
-        'cv_path' => 'https://example.com/cv.pdf',
+        'cv_path' => 'cvs/fake-cv.pdf',
     ]);
 
     Passport::actingAs($company);
@@ -644,6 +672,9 @@ it('changes application status from pending to read when company opens the CV', 
 
 
 it('does not change application status when CV is opened and application is already read', function () {
+    Storage::fake('local');
+    Storage::disk('local')->put('cvs/fake-cv.pdf', 'contenido de prueba');
+
     $company = User::factory()->create(['role' => 'company']);
 
     $offer = Offer::factory()->create([
@@ -653,7 +684,7 @@ it('does not change application status when CV is opened and application is alre
     $application = Application::factory()->create([
         'offer_id' => $offer->id,
         'status' => 'read',
-        'cv_path' => 'https://example.com/cv.pdf',
+        'cv_path' => 'cvs/fake-cv.pdf',
     ]);
 
     Passport::actingAs($company);
@@ -662,12 +693,8 @@ it('does not change application status when CV is opened and application is alre
         "/api/applications/{$application->id}/cv"
     );
 
-    $response->assertOk()
-        ->assertJson([
-            'cv_link' => 'https://example.com/cv.pdf',
-            'status' => 'read',
-        ]);
-
+    $response->assertOk();
+    
     $this->assertDatabaseHas('applications', [
         'id' => $application->id,
         'status' => 'read',
@@ -686,7 +713,6 @@ it('forbids another company from accessing the application CV', function () {
     $application = Application::factory()->create([
         'offer_id' => $offer->id,
         'status' => 'pending',
-        'cv_path' => 'https://example.com/cv.pdf',
     ]);
 
     Passport::actingAs($otherCompany);
@@ -717,7 +743,6 @@ it('forbids a student from accessing the application CV', function () {
         'user_id' => $student->id,
         'offer_id' => $offer->id,
         'status' => 'pending',
-        'cv_path' => 'https://example.com/cv.pdf',
     ]);
 
     Passport::actingAs($student);
@@ -780,6 +805,9 @@ it('returns 404 when accessing CV of a non-existent application', function () {
 
 
 it('does not change accepted application status when company accesses the CV', function () {
+    Storage::fake('local');
+    Storage::disk('local')->put('cvs/fake-cv.pdf', 'contenido de prueba');
+
     $company = User::factory()->create(['role' => 'company']);
 
     $offer = Offer::factory()->create([
@@ -789,7 +817,7 @@ it('does not change accepted application status when company accesses the CV', f
     $application = Application::factory()->create([
         'offer_id' => $offer->id,
         'status' => 'accepted',
-        'cv_path' => 'https://example.com/cv.pdf',
+        'cv_path' => 'cvs/fake-cv.pdf',
     ]);
 
     Passport::actingAs($company);
@@ -798,11 +826,8 @@ it('does not change accepted application status when company accesses the CV', f
         "/api/applications/{$application->id}/cv"
     );
 
-    $response->assertOk()
-        ->assertJson([
-            'cv_link' => 'https://example.com/cv.pdf',
-            'status' => 'accepted',
-        ]);
+    $response->assertOk();
+        
 
     $this->assertDatabaseHas('applications', [
         'id' => $application->id,
@@ -812,6 +837,9 @@ it('does not change accepted application status when company accesses the CV', f
 
 
 it('does not change rejected application status when company accesses the CV', function () {
+    Storage::fake('local');
+    Storage::disk('local')->put('cvs/fake-cv.pdf', 'contenido de prueba');
+
     $company = User::factory()->create(['role' => 'company']);
 
     $offer = Offer::factory()->create([
@@ -821,7 +849,7 @@ it('does not change rejected application status when company accesses the CV', f
     $application = Application::factory()->create([
         'offer_id' => $offer->id,
         'status' => 'rejected',
-        'cv_path' => 'https://example.com/cv.pdf',
+        'cv_path' => 'cvs/fake-cv.pdf',
     ]);
 
     Passport::actingAs($company);
@@ -830,11 +858,8 @@ it('does not change rejected application status when company accesses the CV', f
         "/api/applications/{$application->id}/cv"
     );
 
-    $response->assertOk()
-        ->assertJson([
-            'cv_link' => 'https://example.com/cv.pdf',
-            'status' => 'rejected',
-        ]);
+    $response->assertOk();
+        
 
     $this->assertDatabaseHas('applications', [
         'id' => $application->id,
@@ -843,6 +868,9 @@ it('does not change rejected application status when company accesses the CV', f
 });
 
 it('keeps application as read when company opens CV again', function () {
+    Storage::fake('local');
+    Storage::disk('local')->put('cvs/fake-cv.pdf', 'contenido de prueba');
+
     $company = User::factory()->create(['role' => 'company']);
 
     $offer = Offer::factory()->create([
@@ -852,7 +880,7 @@ it('keeps application as read when company opens CV again', function () {
     $application = Application::factory()->create([
         'offer_id' => $offer->id,
         'status' => 'read',
-        'cv_path' => 'https://example.com/cv.pdf',
+        'cv_path' => 'cvs/fake-cv.pdf',
     ]);
 
     Passport::actingAs($company);
@@ -867,6 +895,9 @@ it('keeps application as read when company opens CV again', function () {
 });
 
 it('does not change accepted application back to read when CV is opened', function () {
+    Storage::fake('local');
+    Storage::disk('local')->put('cvs/fake-cv.pdf', 'contenido de prueba');
+
     $company = User::factory()->create(['role' => 'company']);
 
     $offer = Offer::factory()->create([
@@ -876,7 +907,7 @@ it('does not change accepted application back to read when CV is opened', functi
     $application = Application::factory()->create([
         'offer_id' => $offer->id,
         'status' => 'accepted',
-        'cv_path' => 'https://example.com/cv.pdf',
+        'cv_path' => 'cvs/fake-cv.pdf',
     ]);
 
     Passport::actingAs($company);
@@ -891,6 +922,9 @@ it('does not change accepted application back to read when CV is opened', functi
 });
 
 it('does not change rejected application back to read when CV is opened', function () {
+    Storage::fake('local');
+    Storage::disk('local')->put('cvs/fake-cv.pdf', 'contenido de prueba');
+
     $company = User::factory()->create(['role' => 'company']);
 
     $offer = Offer::factory()->create([
@@ -900,7 +934,7 @@ it('does not change rejected application back to read when CV is opened', functi
     $application = Application::factory()->create([
         'offer_id' => $offer->id,
         'status' => 'rejected',
-        'cv_path' => 'https://example.com/cv.pdf',
+        'cv_path' => 'cvs/fake-cv.pdf',
     ]);
 
     Passport::actingAs($company);

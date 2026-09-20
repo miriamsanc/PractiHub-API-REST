@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Requests\StoreApplicationRequest;
 use App\Http\Requests\UpdateApplicationRequest;
 use App\Http\Resources\ApplicationResource;
+use App\Http\Resources\ApplicationListResource;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +22,8 @@ class ApplicationController extends Controller
      * Apply to offer
      * 
      * Submits a student's application to a specific offer. Allows uploading a CV file.
+     * 
+     * @bodyParam cv file required The student's CV in PDF format (Max: 2MB).
      * 
      * @authenticated
      */
@@ -103,7 +106,7 @@ class ApplicationController extends Controller
                 ->get();
         }
 
-        return ApplicationResource::collection($applications);
+        return ApplicationListResource::collection($applications);
     }
     
     /**
@@ -168,6 +171,10 @@ class ApplicationController extends Controller
 
         $application->delete();
 
+        if ($application->cv_path) {
+            Storage::delete($application->cv_path);
+        }
+
         return response()->json([
             'message' => 'Application withdrawn successfully'
         ], 200);
@@ -190,7 +197,7 @@ class ApplicationController extends Controller
             ->with('user')
             ->get();
 
-        return ApplicationResource::collection($applications);
+        return ApplicationListResource::collection($applications);
     }
 
     /**
