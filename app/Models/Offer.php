@@ -12,6 +12,10 @@ class Offer extends Model
 
     protected $fillable = ['user_id', 'category_id', 'title', 'description', 'location', 'is_active'];
 
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
     public function company()
     {
         return $this->belongsTo(User::class, 'user_id');

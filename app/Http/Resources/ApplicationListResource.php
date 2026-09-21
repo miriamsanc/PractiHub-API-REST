@@ -18,6 +18,9 @@ class ApplicationListResource extends JsonResource
             'id' => $this->id,
             'status' => $this->status,
             'applied_at' => $this->created_at->format('Y-m-d H:i:s'),
+
+            // Enlace autenticado para ver/descargar el CV (igual que en ApplicationResource)
+            'cv_link' => $this->cv_path ? url("/api/applications/{$this->id}/cv") : null,
  
             // Resumen de la oferta: lo justo para identificarla en una lista
             'offer' => $this->whenLoaded('offer', function () {
@@ -33,6 +36,7 @@ class ApplicationListResource extends JsonResource
                 return [
                     'id' => $this->user->id,
                     'name' => $this->user->name,
+                    'email' => $this->user->email,
                 ];
             }),
         ];
